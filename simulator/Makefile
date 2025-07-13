@@ -39,6 +39,7 @@ OBJS = \
     $O/HTLC.o \
     $O/netBuilder.o \
     $O/baseMessage_m.o \
+    $O/clustering_m.o \
     $O/commitmentSigned_m.o \
     $O/invoice_m.o \
     $O/payment_m.o \
@@ -51,6 +52,7 @@ OBJS = \
 # Message files
 MSGFILES = \
     baseMessage.msg \
+    clustering.msg \
     commitmentSigned.msg \
     invoice.msg \
     payment.msg \
@@ -120,7 +122,9 @@ $O/$(TARGET): $(OBJS)  $(wildcard $(EXTRA_OBJS)) Makefile $(CONFIGFILE)
 
 .PHONY: all clean cleanall depend msgheaders smheaders
 
-.SUFFIXES: .cpp
+# disabling all implicit rules
+.SUFFIXES :
+.PRECIOUS : %_m.h %_m.cpp
 
 $O/%.o: %.cpp $(COPTS_FILE) | msgheaders smheaders
 	@$(MKPATH) $(dir $@)

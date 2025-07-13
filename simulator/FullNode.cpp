@@ -8,80 +8,10 @@
 #include "revokeAndAck_m.h"
 #include "paymentRefused_m.h"
 #include "HTLC.h"
-
-class FullNode : public cSimpleModule {
-
-    protected:
-        // Protected data structures
-        std::map<std::string, std::string> _myPreImages; // paymentHash to preImage
-        std::map<std::string, std::string> _myInFlights; // paymentHash to nodeName (who owes me)
-        std::map<std::string, std::string> _myPayments; //paymentHash to status (PENDING, COMPLETED, FAILED, or CANCELED)
-        std::map<std::string, BaseMessage *> _myStoredMessages; // paymentHash to baseMsg (for finding reverse path)
-        std::map<std::string, cModule*> _senderModules; // paymentHash to Module
-
-        // Omnetpp functions
-        virtual void initialize() override;
-        virtual void handleMessage(cMessage *msg) override;
-        virtual void refreshDisplay() const;
-        virtual void finish() override;
-
-        // Routing functions
-        virtual std::vector<std::string> getPath(std::map<std::string, std::string> parents, std::string target);
-        virtual std::string minDistanceNode (std::map<std::string, double> distances, std::map<std::string, bool> visited);
-        virtual std::vector<std::string> dijkstraWeightedShortestPath (std::string src, std::string target, std::map<std::string, std::vector<std::pair<std::string, std::vector<double> > > > graph);
-
-        // Message handlers
-        virtual void initHandler (BaseMessage *baseMsg);
-        virtual void invoiceHandler (BaseMessage *baseMsg);
-        virtual void updateAddHTLCHandler (BaseMessage *baseMsg);
-        virtual void updateFulfillHTLCHandler (BaseMessage *baseMsg);
-        virtual void updateFailHTLCHandler (BaseMessage *baseMsg);
-        virtual void paymentRefusedHandler (BaseMessage *baseMsg);
-        virtual void commitSignedHandler (BaseMessage *baseMsg);
-        virtual void revokeAndAckHandler (BaseMessage *baseMsg);
-
-        // HTLC senders
-        virtual void sendFirstFulfillHTLC (HTLC *htlc, std::string firstHop);
-        virtual void sendFirstFailHTLC (HTLC *htlc, std::string firstHop);
-
-        // HTLC committers
-        virtual void commitUpdateAddHTLC (HTLC *htlc, std::string neighbor);
-        virtual void commitUpdateFulfillHTLC (HTLC *htlc, std::string neighbor);
-        virtual void commitUpdateFailHTLC (HTLC *htlc, std::string neighbor);
-        virtual void commitHTLC(HTLC *htlc, std::string neighbor);
-
-        // Statistics
-        // virtual void initStatistics();
-        virtual void initPerModuleStatistics();
-
-        // Util functions
-        virtual bool tryUpdatePaymentChannel (std::string nodeName, double value, bool increase);
-        virtual bool hasCapacityToForward (std::string nodeName, double value);
-        virtual bool tryCommitTxOrFail (std::string, bool);
-        virtual Invoice* generateInvoice (std::string srcName, double value);
-        virtual void setInFlight (HTLC *htlc, std::string nextHop);
-        virtual bool isInFlight (HTLC *htlc, std::string nextHop);
-        virtual std::vector <HTLC *> getSortedPendingHTLCs (std::vector<HTLC *> HTLCs, std::string neighbor);
-        virtual std::string createHTLCId (std::string paymentHash, int htlcType);
-
-    public:
-        // Public data structures
-        bool _isFirstSelfMessage;
-        cTopology *_localTopology;
-        int localCommitCounter;
-        typedef std::map<std::string, int> RoutingTable;  // neighborName to gateIndex
-        RoutingTable rtable;
-        std::map<std::string, PaymentChannel> _paymentChannels; // neighborName to PaymentChannel
-        std::map<std::string, int> _signals; // myName to signal
-
-        // Statistic-related variables
-        int _countCompleted = 0;
-        int _countFailed = 0;
-        int _countCanceled = 0;
-        double _paymentGoodputSent = 0;
-        double _paymentGoodputAll = 0;
-
-};
+#include "FullNode.h"
+#include "clustering_m.h"
+#include "clusterGraph.h"
+#include "Cluster.h"
 
 // Define module and initialize random number generator
 Define_Module(FullNode);
@@ -90,139 +20,598 @@ Define_Module(FullNode);
 /* OMNETPP FUNCTIONS                                                                                                   */
 /***********************************************************************************************************************/
 
-void FullNode::initialize() {
+void FullNode::sendClusterInfoTo(const std::string& neighbor) {
+    ClusterInfoMsg* msg = new ClusterInfoMsg();
 
-    // Get name (id) and initialize local topology based on the global topology created by netBuilder
-    _localTopology = globalTopology;
-    this->localCommitCounter = 0;
+    msg->setSender(getName());
+    msg->setClusterID(clusterID.c_str());
+    msg->setCIP(CIP.c_str());
+    msg->setNumNodes(1);              // Single node cluster initially
+    msg->setNumEdges(_paymentChannels.size());
+    msg->setMergedNumNodes(1 + 1);    // Conservative default merge size
+    msg->setMergedNumEdges(_paymentChannels.size() + 1); // Dummy
+
+    send(msg, "out", rtable[neighbor]);
+}
+
+
+ClusterInfo FullNode::waitForClusterInfoFrom(const std::string& neighbor) {
+    ClusterInfoMsg msg = receivedClusterInfos[neighbor];  // Filled in handleMessage()
+
+    ClusterInfo ci(
+        msg.getSender(),
+        msg.getClusterID(),
+        msg.getCIP(),
+        msg.getNumNodes(),
+        msg.getNumEdges(),
+        msg.getMergedNumNodes(),
+        msg.getMergedNumEdges()
+    );
+    return ci;
+}
+
+
+double FullNode::computeDeltaS(const ClusterInfo& local, const ClusterInfo& remote) {
+    int L = local.numEdges + remote.numEdges;
+
+    // Estimate new inter-cluster edges after merging
+    int Lprime = L - 1;  // Remove one inter-cluster link that becomes intra-cluster
+
+    int V = local.numNodes + remote.numNodes;
+
+    int mergedNumNodes = V;
+
+    // Estimate intra-cluster edges after merging
+    int mergedNumEdges = local.numEdges + remote.numEdges + 1;
+
+    int term1 = L - Lprime;
+    int term2 = (V - 1) * (local.numNodes * local.numEdges + remote.numNodes * remote.numEdges - mergedNumNodes * mergedNumEdges);
+
+    double deltaS = term1 + term2;
+    return deltaS;
+}
+
+
+
+void FullNode::sendMergeRequest(const std::string& targetCIP) {
+    MergeRequestMsg* msg = new MergeRequestMsg();
+    msg->setSender(getName());
+    msg->setClusterID(clusterID.c_str());
+    send(msg, "out", rtable[targetCIP]);
+    EV << "[Cluster] Sent MergeRequest to " << targetCIP << "\n";
+}
+
+void FullNode::handleMergeRequest(MergeRequestMsg* msg) {
+    std::string sender = msg->getSender();
+    std::string senderCluster = msg->getClusterID();
+    EV << "[Cluster] Received MergeRequest from " << sender << " (cluster: " << senderCluster << ")\n";
+
+    // Respond with MergeAck if we also want to merge
+    MergeAckMsg* ack = new MergeAckMsg();
+    ack->setSender(getName());
+    ack->setAcceptedCluster(clusterID.c_str());
+    send(ack, "out", rtable[sender]);
+    EV << "[Cluster] Sent MergeAck to " << sender << "\n";
+
+    delete msg;
+}
+
+void FullNode::handleMergeAck(MergeAckMsg* msg) {
+    std::string sender = msg->getSender();
+    EV << "[Cluster] Received MergeAck from " << sender << "\n";
+    // Store merge intent (you can refine this with a set/map)
+    mergeResponses.insert(sender);
+    delete msg;
+}
+void FullNode::handleMergeNack(MergeNackMsg* msg) {
+    std::string sender = msg->getSender();
+    EV << "[Cluster] Received MergeNack from " << sender << "\n";
+    mergeResponses.erase(sender);
+    delete msg;
+}
+
+bool FullNode::receivedMutualMergeRequest(const std::string& targetCIP) {
+    return mergeResponses.find(targetCIP) != mergeResponses.end();
+}
+
+void FullNode::mergeClusters(const std::string& a, const std::string& b, const std::string& mergedID) {
+    clusterID = mergedID;
+    CIP = mergedID;
+
+    EV << "[Cluster] " << a << " and " << b << " merged to form " << mergedID << "\n";
+
+    // Merge both sets
+    std::set<std::string> allMembers = clusterMembers;
+    std::set<std::string> otherMembers = knownClusterMembers[b];
+    allMembers.insert(otherMembers.begin(), otherMembers.end());
+
+    // Broadcast updated cluster info
+    for (const std::string& member : allMembers) {
+        if (member == getName()) continue;  // self is updated
+
+        ClusterUpdateMsg* msg = new ClusterUpdateMsg();
+        msg->setNewClusterID(mergedID.c_str());
+        msg->setNewCIP(mergedID.c_str());
+        send(msg, "out", rtable[member]);
+    }
+
+    // Update local structures
+    clusterMembers = allMembers;
+    knownClusterMembers[mergedID] = allMembers;
+
+    // Update node-to-cluster mapping
+    for (const std::string& node : allMembers) {
+        nodeToCluster[node] = mergedID;
+    }
+
+    // Update intra/inter cluster neighbors
+    intraClusterNeighbors.clear();
+    interClusterNeighbors.clear();
+
+    for (const auto& [neighborName, pcTuple] : nameToPCs[getName()]) {
+        if (neighborName == getName()) continue;
+
+        if (allMembers.count(neighborName)) {
+            intraClusterNeighbors.insert(neighborName);
+        } else {
+            interClusterNeighbors.insert(neighborName);
+        }
+    }
+    intraClusterNeighbors.insert(getName());
+
+    // Optional: rerun clustering if you're still CIP
+    if (CIP == getName()) {
+        runClusteringRound();
+    }
+}
+
+
+// Implementing the cluster formation algorithm (Algorithm 1 from the CRP paper)
+int FullNode::countClusterEdges(const std::set<std::string>& members) {
+    int count = 0;
+    for (const std::string& n : members) {
+        for (const auto& [neighbor, pc] : nameToPCs[n]) {
+            if (members.count(neighbor)) {
+                count++;
+            }
+        }
+    }
+    return count / 2;  // Each edge counted twice
+}
+
+void FullNode::runClusteringRound() {
     std::string myName = getName();
+
+    if (CIP != myName) {
+        EV << "[Cluster] Skipping clustering round — not a CIP: " << myName << "\n";
+        return;
+    }
+
+    // Clear old state
+    receivedClusterInfos.clear();
+    mergeResponses.clear();
+
+    // Step 1: Send EC(vi) to all neighbor CIPs
+    for (const std::string& neighbor : interClusterNeighbors) {
+        sendClusterInfoTo(neighbor);
+    }
+
+    // Step 2: Wait and collect EC responses (synchronously for now)
+    std::map<std::string, double> deltaSByNeighbor;
+
+    for (const std::string& neighbor : interClusterNeighbors) {
+        ClusterInfo receivedEC = waitForClusterInfoFrom(neighbor);
+
+        // Construct local cluster info
+        ClusterInfo thisCluster(
+            getName(), clusterID, CIP,
+            clusterMembers.size(),
+            countClusterEdges(clusterMembers),
+            0, 0  // mergedNum* not used anymore
+        );
+
+        double deltaS = computeDeltaS(thisCluster, receivedEC);
+        EV << "[Cluster] ΔS with " << neighbor << " = " << deltaS << "\n";
+
+        if (deltaS > 0) {
+            deltaSByNeighbor[neighbor] = deltaS;
+        }
+    }
+
+    if (deltaSByNeighbor.empty()) {
+        EV << "[Cluster] No merges proposed for: " << myName << "\n";
+        return;
+    }
+
+    // Step 3: Pick top neighbor with max ΔS
+    auto bestMerge = std::max_element(
+        deltaSByNeighbor.begin(), deltaSByNeighbor.end(),
+        [](const auto& a, const auto& b) { return a.second < b.second; }
+    );
+
+    std::string targetCIP = bestMerge->first;
+    sendMergeRequest(targetCIP);
+
+    // Step 4: Wait for ACK
+    if (receivedMutualMergeRequest(targetCIP)) {
+        std::string newClusterID = std::min(myName, targetCIP);
+        mergeClusters(myName, targetCIP, newClusterID);
+    } else {
+        EV << "[Cluster] No mutual merge confirmation with " << targetCIP << "\n";
+    }
+}
+
+
+void FullNode::initialize() {
+    std::string myName = getName();
+    clusterID = myName;   // Initially, every node is its own cluster
+    CIP = myName;         // Each node starts as its own Cluster Information Proxy (CIP)
+
+    EV << "[Init] Node: " << myName << " initialized with clusterID: " << clusterID << " and acts as its own CIP.\n";
+
+    // Step 1: Setup local topology view
+    _localTopology = globalTopology;
+
+    // Step 2: Copy workload from global structure
     std::map<std::string, std::vector<std::tuple<std::string, double, simtime_t>>> localPendingPayments = pendingPayments;
 
-    // Initialize payment channels
+    // Step 3: Initialize Payment Channels and statistics
     for (auto& neighborToPCs : nameToPCs[myName]) {
         std::string neighborName = neighborToPCs.first;
-        std::tuple<double, double, double, int, double, double, cGate*, cGate*> pcTuple = neighborToPCs.second;
-        double capacity = std::get<0>(pcTuple);
-        double fee = std::get<1>(pcTuple);
-        double quality = std::get<2>(pcTuple);
-        int maxAcceptedHTLCs = std::get<3>(pcTuple);
-        int numHTLCs = 0;
-        double HTLCMinimumMsat = std::get<4>(pcTuple);
-        double channelReserveSatoshis = std::get<5>(pcTuple);
-        cGate* localGate = std::get<6>(pcTuple);
-        cGate* neighborGate = std::get<7>(pcTuple);
+        auto pcTuple = neighborToPCs.second;
 
-        PaymentChannel pc = PaymentChannel(capacity, fee, quality, maxAcceptedHTLCs, numHTLCs, HTLCMinimumMsat, channelReserveSatoshis, localGate, neighborGate);
+        double capacity               = std::get<0>(pcTuple);
+        double fee                    = std::get<1>(pcTuple);
+        double quality                = std::get<2>(pcTuple);
+        int maxAcceptedHTLCs         = std::get<3>(pcTuple);
+        int numHTLCs                 = 0;
+        double HTLCMinimumMsat       = std::get<4>(pcTuple);
+        double channelReserveSatoshis= std::get<5>(pcTuple);
+        cGate* localGate             = std::get<6>(pcTuple);
+        cGate* neighborGate          = std::get<7>(pcTuple);
+
+        PaymentChannel pc = PaymentChannel(capacity, fee, quality, maxAcceptedHTLCs, numHTLCs,
+                                           HTLCMinimumMsat, channelReserveSatoshis, localGate, neighborGate);
+
         _paymentChannels[neighborName] = pc;
 
-        // Register per channel statistics
-            std::string signalName = myName +"-to-" + neighborName + ":capacity";
-            simsignal_t signal = registerSignal(signalName.c_str());
-            _signals[signalName] = signal;
-            emit(_signals[signalName], _paymentChannels[neighborName]._capacity);
+        // Register signal/statistic for capacity
+        std::string signalName = myName + "-to-" + neighborName + ":capacity";
+        simsignal_t signal = registerSignal(signalName.c_str());
+        _signals[signalName] = signal;
+        emit(_signals[signalName], capacity);
 
-            std::string statisticName = myName +"-to-" + neighborName + ":capacity";
-            cProperty *statisticTemplate = getProperties()->get("statisticTemplate", "pcCapacities");
-            getEnvir()->addResultRecorders(this, signal, statisticName.c_str(), statisticTemplate);
+        cProperty* statTemplate = getProperties()->get("statisticTemplate", "pcCapacities");
+        getEnvir()->addResultRecorders(this, signal, signalName.c_str(), statTemplate);
+
+        // Build initial routing table
+        rtable[neighborName] = localGate->getIndex();
+
+        // TEMPORARY (before clustering round): Treat all neighbors as inter-cluster
+        if (neighborName != myName) {
+            interClusterNeighbors.insert(neighborName);
+        }
     }
 
-    // Initialize per module statistics
+    // Step 4: Register self as initial cluster member (only self at start)
+    clusterMembers.insert(myName);
+    knownClusterMembers[clusterID] = clusterMembers;
+    nodeToCluster[myName] = clusterID;
+
+    // Step 5: Run clustering round
+    runClusteringRound();
+
+    // Step 6: After clustering, populate intra-cluster neighbor set
+    intraClusterNeighbors.clear();
+    for (const std::string& member : knownClusterMembers[clusterID]) {
+        if (member != myName) {
+            intraClusterNeighbors.insert(member);
+        }
+    }
+    intraClusterNeighbors.insert(myName); // include self for Dijkstra
+
+    // Debug: Print intra-cluster neighbors
+    EV << "[CRP] Intra-cluster neighbors of " << myName << ": ";
+    for (const auto& n : intraClusterNeighbors) {
+        EV << n << " ";
+    }
+    EV << endl;
+
+    // Step 7: Register module-wide stats
     initPerModuleStatistics();
 
-    // Build routing table
-    cTopology::Node *thisNode = _localTopology->getNodeFor(this);
-    for (int i = 0; i < _localTopology->getNumNodes(); i++) {
-        if (_localTopology->getNode(i) == thisNode)
-            continue;  // skip ourselves
+    // Step 8: Schedule payments (workload)
+    if (pendingPayments.find(myName) != pendingPayments.end()) {
+        std::vector<std::tuple<std::string, double, simtime_t>> myWorkload = pendingPayments[myName];
 
-        _localTopology->calculateWeightedSingleShortestPathsTo(_localTopology->getNode(i));
+        for (const auto& paymentTuple : myWorkload) {
+            std::string srcName = std::get<0>(paymentTuple);
+            double value        = std::get<1>(paymentTuple);
+            simtime_t time      = std::get<2>(paymentTuple);
 
-        if (thisNode->getNumPaths() == 0)
-            continue;  // not connected
+            char msgname[100];
+            sprintf(msgname, "%s-to-%s;value:%0.1f", srcName.c_str(), myName.c_str(), value);
 
-        cGate *parentModuleGate = thisNode->getPath(0)->getLocalGate();
-        int gateIndex = parentModuleGate->getIndex();
-        std::string nodeName = _localTopology->getNode(i)->getModule()->getName();
-        rtable[nodeName] = gateIndex;
-        EV << "  towards " << nodeName << " gateIndex is " << gateIndex << endl;
-    }
+            Payment* trMsg = new Payment(msgname);
+            trMsg->setSource(srcName.c_str());
+            trMsg->setDestination(myName.c_str());
+            trMsg->setValue(value);
+            trMsg->setHopCount(0);
 
-    // Schedule payments according to workload
-    std::map<std::string, std::vector<std::tuple<std::string, double, simtime_t>>>::iterator it = pendingPayments.find(myName);
-    if (it != pendingPayments.end()) {
-        std::vector<std::tuple<std::string, double, simtime_t>> myWorkload = it->second;
+            BaseMessage* baseMsg = new BaseMessage();
+            baseMsg->setMessageType(TRANSACTION_INIT);
+            baseMsg->setHopCount(0);
+            baseMsg->encapsulate(trMsg);
 
-        for (const auto& paymentTuple: myWorkload) {
-
-             std::string srcName = std::get<0>(paymentTuple);
-             double value = std::get<1>(paymentTuple);
-             simtime_t time = std::get<2>(paymentTuple);
-             char msgname[100];
-             sprintf(msgname, "%s-to-%s;value:%0.1f", srcName.c_str(), myName.c_str(), value);
-
-             // Create payment message
-             Payment *trMsg = new Payment(msgname);
-             trMsg->setSource(srcName.c_str());
-             trMsg->setDestination(myName.c_str());
-             trMsg->setValue(value);
-             trMsg->setHopCount(0);
-
-             // Create base message
-             BaseMessage *baseMsg = new BaseMessage();
-             baseMsg->setMessageType(TRANSACTION_INIT);
-             baseMsg->setHopCount(0);
-
-             // Encapsulate and schedule
-             baseMsg->encapsulate(trMsg);
-             scheduleAt(simTime()+time, baseMsg);
-             _isFirstSelfMessage = true;
+            scheduleAt(simTime() + time, baseMsg);
+            _isFirstSelfMessage = true;
         }
     } else {
-        EV << "No workload found for " << myName.c_str() << ".\n";
+        EV << "No workload found for " << myName << ".\n";
     }
 }
+
+
+// FullNode.cpp (continued)
+
+
 
 void FullNode::handleMessage(cMessage *msg) {
-    // Decapsulates and treats messages according to their message types
+    // Check for clustering-related messages first
+    if (ClusterInfoMsg* ci = dynamic_cast<ClusterInfoMsg*>(msg)) {
+        receivedClusterInfos[ci->getSender()] = *ci;
+        delete ci;
+        return;
+    }
 
+    if (ClusterUpdateMsg* cu = dynamic_cast<ClusterUpdateMsg*>(msg)) {
+        clusterID = cu->getNewClusterID();
+        CIP = cu->getNewCIP();
+        EV << "[Cluster] Updated to new clusterID: " << clusterID << ", CIP: " << CIP << "\n";
+        delete cu;
+        return;
+    }
+
+
+    if (MergeRequestMsg* mr = dynamic_cast<MergeRequestMsg*>(msg)) {
+        handleMergeRequest(mr);
+        return;
+    }
+
+    if (MergeAckMsg* ma = dynamic_cast<MergeAckMsg*>(msg)) {
+        handleMergeAck(ma);
+        return;
+    }
+
+    if (MergeNackMsg* mn = dynamic_cast<MergeNackMsg*>(msg)) {
+        handleMergeNack(mn);
+        return;
+    }
+
+    // Proceed with PCN BaseMessage logic
     BaseMessage *baseMsg = check_and_cast<BaseMessage *>(msg);
 
-    switch(baseMsg->getMessageType()) {
-
-        case TRANSACTION_INIT: {
-            initHandler(baseMsg);
-            break;
-        }
-        case INVOICE: {
-            invoiceHandler(baseMsg);
-            break;
-        }
-        case UPDATE_ADD_HTLC: {
-            updateAddHTLCHandler(baseMsg);
-            break;
-        }
-        case UPDATE_FULFILL_HTLC: {
-            updateFulfillHTLCHandler(baseMsg);
-            break;
-        }
-        case UPDATE_FAIL_HTLC: {
-            updateFailHTLCHandler(baseMsg);
-            break;
-        }
-        case PAYMENT_REFUSED: {
-            paymentRefusedHandler(baseMsg);
-            break;
-        }
-        case COMMITMENT_SIGNED: {
-            commitSignedHandler(baseMsg);
-            break;
-        }
-        case REVOKE_AND_ACK: {
-            revokeAndAckHandler(baseMsg);
-            break;
-        }
+    switch (baseMsg->getMessageType()) {
+        case TRANSACTION_INIT:       initHandler(baseMsg); break;
+        case INVOICE:                invoiceHandler(baseMsg); break;
+        case UPDATE_ADD_HTLC:        updateAddHTLCHandler(baseMsg); break;
+        case UPDATE_FULFILL_HTLC:    updateFulfillHTLCHandler(baseMsg); break;
+        case UPDATE_FAIL_HTLC:       updateFailHTLCHandler(baseMsg); break;
+        case PAYMENT_REFUSED:        paymentRefusedHandler(baseMsg); break;
+        case COMMITMENT_SIGNED:      commitSignedHandler(baseMsg); break;
+        case REVOKE_AND_ACK:         revokeAndAckHandler(baseMsg); break;
     }
 }
+
+std::vector<std::string> FullNode::intraClusterDijkstra(const std::string& src, const std::string& dst) {
+    std::map<std::string, double> dist;
+    std::map<std::string, std::string> prev;
+    std::set<std::string> visited;
+
+    // Initialize distances to infinity and prev to empty
+    for (const std::string& node : intraClusterNeighbors) {
+        dist[node] = std::numeric_limits<double>::infinity();
+        prev[node] = "";
+    }
+    dist[src] = 0;
+
+    auto minDistanceNode = [&dist, &visited]() -> std::string {
+        double minDist = std::numeric_limits<double>::infinity();
+        std::string minNode = "";
+        for (const auto& [node, d] : dist) {
+            if (visited.find(node) == visited.end() && d < minDist) {
+                minDist = d;
+                minNode = node;
+            }
+        }
+        return minNode;
+    };
+
+    while (visited.size() < intraClusterNeighbors.size()) {
+        std::string u = minDistanceNode();
+        if (u == "") break;
+        visited.insert(u);
+
+        // For each neighbor of u within the same cluster
+        for (const auto& [neighbor, pc] : nameToPCs[u]) {
+            if (intraClusterNeighbors.find(neighbor) == intraClusterNeighbors.end()) continue;
+
+            double capacity = std::get<0>(pc);  // 0th element is _capacity
+
+            double weight = 1.0 / capacity;
+
+            if (dist[u] + weight < dist[neighbor]) {
+                dist[neighbor] = dist[u] + weight;
+                prev[neighbor] = u;
+            }
+        }
+    }
+
+    // Reconstruct path from src to dst
+    std::vector<std::string> path;
+    std::string current = dst;
+    while (current != "" && current != src) {
+        path.insert(path.begin(), current);
+        current = prev[current];
+    }
+
+    if (current == src) {
+        path.insert(path.begin(), src);
+    } else {
+        path.clear();  // No path found
+    }
+
+    return path;
+}
+std::vector<std::vector<std::string>> FullNode::yensKShortestPaths(
+    const ClusterGraph& graph,
+    const std::string& srcCluster,
+    const std::string& dstCluster,
+    int K)
+{
+    using Path = std::vector<std::string>;
+    using WeightedPath = std::pair<double, Path>; // cost, path
+
+    auto dijkstraCluster = [&](const std::string& src, const std::string& dst) -> WeightedPath {
+        std::map<std::string, double> dist;
+        std::map<std::string, std::string> prev;
+        std::set<std::string> visited;
+
+        for (const auto& kv : graph.clusters) {
+            dist[kv.first] = std::numeric_limits<double>::infinity();
+            prev[kv.first] = "";
+        }
+        dist[src] = 0;
+
+        while (!visited.count(dst)) {
+            std::string u;
+            double minDist = std::numeric_limits<double>::infinity();
+            for (const auto& kv : dist) {
+                if (!visited.count(kv.first) && kv.second < minDist) {
+                    minDist = kv.second;
+                    u = kv.first;
+                }
+            }
+            if (u.empty()) break;
+
+            visited.insert(u);
+            for (const auto& neighbor : graph.getNeighbors(u)) {
+                double weight = graph.edgeWeights.at(u).at(neighbor);
+                if (dist[u] + weight < dist[neighbor]) {
+                    dist[neighbor] = dist[u] + weight;
+                    prev[neighbor] = u;
+                }
+            }
+        }
+
+        Path path;
+        std::string current = dst;
+        while (!current.empty()) {
+            path.insert(path.begin(), current);
+            current = prev[current];
+        }
+
+        return { dist[dst], path };
+    };
+
+    std::vector<WeightedPath> A;  // shortest paths found
+    std::set<Path> pathSet;
+    std::vector<WeightedPath> B;  // candidate paths
+
+    A.push_back(dijkstraCluster(srcCluster, dstCluster));
+    pathSet.insert(A[0].second);
+
+    for (int k = 1; k < K; ++k) {
+        const Path& lastPath = A[k - 1].second;
+        for (size_t i = 0; i < lastPath.size() - 1; ++i) {
+            Path rootPath(lastPath.begin(), lastPath.begin() + i + 1);
+
+            // Temporarily remove edges
+            ClusterGraph modifiedGraph = graph;
+            for (const auto& p : A) {
+                const Path& other = p.second;
+                if (other.size() > i && std::equal(rootPath.begin(), rootPath.end(), other.begin())) {
+                    std::string u = other[i];
+                    std::string v = other[i + 1];
+                    modifiedGraph.edgeWeights[u].erase(v);
+                }
+            }
+
+            auto spurPath = dijkstraCluster(rootPath.back(), dstCluster);
+            if (!spurPath.second.empty()) {
+                Path totalPath = rootPath;
+                totalPath.insert(totalPath.end(), spurPath.second.begin() + 1, spurPath.second.end());
+                if (pathSet.find(totalPath) == pathSet.end()) {
+                    double totalCost = 0.0;
+                    for (size_t j = 0; j < totalPath.size() - 1; ++j) {
+                        totalCost += graph.edgeWeights.at(totalPath[j]).at(totalPath[j + 1]);
+                    }
+                    B.push_back({ totalCost, totalPath });
+                    pathSet.insert(totalPath);
+                }
+            }
+        }
+
+        if (B.empty()) break;
+
+        std::sort(B.begin(), B.end(), [](const WeightedPath& a, const WeightedPath& b) {
+            return a.first < b.first;
+        });
+
+        A.push_back(B.front());
+        B.erase(B.begin());
+    }
+
+    std::vector<Path> result;
+    for (const auto& wp : A) result.push_back(wp.second);
+    return result;
+}
+std::vector<PathMetrics> FullNode::probeCandidatePaths(const std::vector<std::vector<std::string>>& clusterPaths, double paymentAmount) {
+    std::vector<PathMetrics> results;
+
+    for (const auto& path : clusterPaths) {
+        double totalFee = 0.0;
+        double minCapacity = std::numeric_limits<double>::infinity();
+        double totalQuality = 0.0;
+
+        for (size_t i = 0; i < path.size() - 1; ++i) {
+            std::string fromCluster = path[i];
+            std::string toCluster = path[i + 1];
+
+            // Simulated: you can later replace this with a real message to CIP of fromCluster
+            double fee = clusterGraph.edgeWeights[fromCluster][toCluster];   // simulate fee
+            double capacity = 100.0;   // dummy capacity, query actual if known
+            double quality = 1.0;      // dummy latency or reliability
+
+            totalFee += fee;
+            totalQuality += quality;
+            minCapacity = std::min(minCapacity, capacity);
+        }
+
+        results.emplace_back(path, totalFee, minCapacity, totalQuality);
+    }
+
+    return results;
+}
+PathMetrics FullNode::selectOptimalRouteLP(const std::vector<PathMetrics>& candidatePaths, double paymentAmount) {
+    double bestScore = std::numeric_limits<double>::infinity();
+    PathMetrics bestPath({}, 0, 0, 0);
+
+    for (const auto& p : candidatePaths) {
+        if (p.minCapacity < paymentAmount) continue;
+
+        // Score can be weighted: fee + α × quality
+        double score = p.totalFee + 0.1 * p.totalQuality;
+
+        if (score < bestScore) {
+            bestScore = score;
+            bestPath = p;
+        }
+    }
+
+    return bestPath;
+}
+
 
 void FullNode::refreshDisplay() const {
 
@@ -315,6 +704,79 @@ std::vector<std::string> FullNode::getPath (std::map<std::string, std::string> p
     return path;
 }
 
+std::vector<std::string> FullNode::runCRPRouting(
+    const std::string& srcNode,
+    const std::string& dstNode,
+    double paymentAmount)
+{
+    std::string srcCluster = nodeToCluster[srcNode];
+    std::string dstCluster = nodeToCluster[dstNode];
+
+    EV << "[CRP] Routing payment of " << paymentAmount << " from " << srcNode << " (" << srcCluster
+       << ") to " << dstNode << " (" << dstCluster << ")\n";
+
+    // Step 1: Get K shortest cluster paths using Yen's algorithm
+    int K = 3;
+    auto clusterPaths = yensKShortestPaths(clusterGraph, srcCluster, dstCluster, K);
+    if (clusterPaths.empty()) {
+        EV << "[CRP] No cluster-level paths found\n";
+        return {};
+    }
+
+    // Step 2: Probe each path for fee, quality, capacity
+    auto metrics = probeCandidatePaths(clusterPaths, paymentAmount);
+    if (metrics.empty()) {
+        EV << "[CRP] No feasible candidate paths found\n";
+        return {};
+    }
+
+    // Step 3: Select optimal path using LP/scoring
+    auto bestPathMetrics = selectOptimalRouteLP(metrics, paymentAmount);
+    const auto& clusterPath = bestPathMetrics.clusterPath;
+
+    // Step 4: For each cluster segment, compute intra-cluster Dijkstra
+    std::vector<std::string> fullNodePath;
+
+    for (size_t i = 0; i < clusterPath.size(); ++i) {
+        std::string currentCluster = clusterPath[i];
+        std::string fromNode, toNode;
+
+        if (i == 0) {
+            fromNode = srcNode;
+        } else {
+            fromNode = getCIP(clusterPath[i]); // entry to cluster
+        }
+
+        if (i == clusterPath.size() - 1) {
+            toNode = dstNode;
+        } else {
+            toNode = getCIP(clusterPath[i + 1]); // exit from current cluster
+        }
+
+        std::vector<std::string> subPath = intraClusterDijkstra(fromNode, toNode);
+        if (subPath.empty()) {
+            EV << "[CRP] No intra-cluster path from " << fromNode << " to " << toNode << "\n";
+            return {};
+        }
+
+        if (!fullNodePath.empty()) subPath.erase(subPath.begin()); // avoid duplicate hops
+        fullNodePath.insert(fullNodePath.end(), subPath.begin(), subPath.end());
+    }
+
+    EV << "[CRP] Selected node path: ";
+    for (auto& node : fullNodePath) EV << node << " ";
+    EV << "\n";
+
+    return fullNodePath;
+}
+
+std::string FullNode::getCIP(const std::string& clusterID) {
+    if (clusterGraph.hasCluster(clusterID)) {
+        return clusterGraph.clusters[clusterID].CIP;
+    }
+    return "";
+}
+
 std::vector<std::string> FullNode::dijkstraWeightedShortestPath (std::string src, std::string target, std::map<std::string, std::vector<std::pair<std::string, std::vector<double> > > > graph) {
     // This function returns the Dijkstra's shortest path from a source to some target given an adjacency matrix
 
@@ -376,7 +838,13 @@ void FullNode::initHandler (BaseMessage *baseMsg) {
     std::string srcName = initMsg->getSource();
     std::string srcPath = "PCN." + srcName;
     double value = initMsg->getValue();
-    cModule* srcMod = getModuleByPath(srcPath.c_str());
+    cModule* srcMod = findModuleByPath(srcPath.c_str());
+    if (srcMod == nullptr) {
+        EV_ERROR << "TRANSACTION_INIT failed: Could not find module " << srcPath << "\n";
+        delete baseMsg;
+        return;
+    }
+
     cGate* myGate = this->getOrCreateFirstUnconnectedGate("out", 0, false, true);
     cGate* srcGate = srcMod->getOrCreateFirstUnconnectedGate("in", 0, false, true);
     cDelayChannel *tmpChannel = cDelayChannel::create("tmpChannel");
@@ -407,8 +875,20 @@ void FullNode::invoiceHandler (BaseMessage *baseMsg) {
     double value = invMsg->getValue();
 
     // Find route to destination
-    std::vector<std::string> path = this->dijkstraWeightedShortestPath(myName, dstName, adjMatrix);
-    std::string firstHop = path[1];
+    std::vector<std::string> path = runCRPRouting(myName, dstName, value);
+
+if (path.empty()) {
+    EV << "[CRP] No path found for invoice to " << dstName << ". Canceling.\n";
+    _myPayments[paymentHash] = "CANCELED";
+    _countCanceled++;
+    _paymentGoodputAll = double(_countCompleted)/double(_countCompleted + _countFailed + _countCanceled);
+    emit(_signals["canceledPayments"], _countCanceled);
+    emit(_signals["paymentGoodputAll"], _paymentGoodputAll);
+    return;
+}
+
+std::string firstHop = path[1];
+
 
     // If payment is larger than our capacity in the outbound payment channel, mark is as canceled and return
    if (!hasCapacityToForward(firstHop, value)) {
@@ -1466,3 +1946,6 @@ std::vector <HTLC *> FullNode::getSortedPendingHTLCs (std::vector<HTLC *> HTLCs,
 std::string FullNode::createHTLCId (std::string paymentHash, int htlcType) {
     return paymentHash + ":" + std::to_string(htlcType);
 }
+
+std::map<std::string, std::string> FullNode::nodeToCluster;
+ClusterGraph FullNode::clusterGraph;
