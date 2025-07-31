@@ -1,0 +1,1977 @@
+version 3
+run General-0-20250708-22:10:53-4138
+attr configname General
+attr datetime 20250708-22:10:53
+attr datetimef 20250708-221053
+attr experiment General
+attr inifile pCN.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network PCN
+attr processid 4138
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config network PCN
+config fname-append-host true
+config result-dir results
+
+par PCN.node0.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node0.out[0].channel disabled false
+attr mutable ""
+par PCN.node0.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node0.out[1].channel typename "\"ned.DelayChannel\""
+par PCN.node0.out[1].channel disabled false
+attr mutable ""
+par PCN.node0.out[1].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node0.out[2].channel typename "\"ned.DelayChannel\""
+par PCN.node0.out[2].channel disabled false
+attr mutable ""
+par PCN.node0.out[2].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node1.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node1.out[0].channel disabled false
+attr mutable ""
+par PCN.node1.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node1.out[1].channel typename "\"ned.DelayChannel\""
+par PCN.node1.out[1].channel disabled false
+attr mutable ""
+par PCN.node1.out[1].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node1.out[2].channel typename "\"ned.DelayChannel\""
+par PCN.node1.out[2].channel disabled false
+attr mutable ""
+par PCN.node1.out[2].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node1.out[3].channel typename "\"ned.DelayChannel\""
+par PCN.node1.out[3].channel disabled false
+attr mutable ""
+par PCN.node1.out[3].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node2.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node2.out[0].channel disabled false
+attr mutable ""
+par PCN.node2.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node2.out[1].channel typename "\"ned.DelayChannel\""
+par PCN.node2.out[1].channel disabled false
+attr mutable ""
+par PCN.node2.out[1].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node2.out[2].channel typename "\"ned.DelayChannel\""
+par PCN.node2.out[2].channel disabled false
+attr mutable ""
+par PCN.node2.out[2].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node2.out[3].channel typename "\"ned.DelayChannel\""
+par PCN.node2.out[3].channel disabled false
+attr mutable ""
+par PCN.node2.out[3].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node2.out[4].channel typename "\"ned.DelayChannel\""
+par PCN.node2.out[4].channel disabled false
+attr mutable ""
+par PCN.node2.out[4].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node2.out[5].channel typename "\"ned.DelayChannel\""
+par PCN.node2.out[5].channel disabled false
+attr mutable ""
+par PCN.node2.out[5].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node2.out[6].channel typename "\"ned.DelayChannel\""
+par PCN.node2.out[6].channel disabled false
+attr mutable ""
+par PCN.node2.out[6].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node2.out[7].channel typename "\"ned.DelayChannel\""
+par PCN.node2.out[7].channel disabled false
+attr mutable ""
+par PCN.node2.out[7].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node2.out[8].channel typename "\"ned.DelayChannel\""
+par PCN.node2.out[8].channel disabled false
+attr mutable ""
+par PCN.node2.out[8].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node2.out[9].channel typename "\"ned.DelayChannel\""
+par PCN.node2.out[9].channel disabled false
+attr mutable ""
+par PCN.node2.out[9].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node3.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node3.out[0].channel disabled false
+attr mutable ""
+par PCN.node3.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node3.out[1].channel typename "\"ned.DelayChannel\""
+par PCN.node3.out[1].channel disabled false
+attr mutable ""
+par PCN.node3.out[1].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node3.out[2].channel typename "\"ned.DelayChannel\""
+par PCN.node3.out[2].channel disabled false
+attr mutable ""
+par PCN.node3.out[2].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node4.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node4.out[0].channel disabled false
+attr mutable ""
+par PCN.node4.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node5.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node5.out[0].channel disabled false
+attr mutable ""
+par PCN.node5.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node5.out[1].channel typename "\"ned.DelayChannel\""
+par PCN.node5.out[1].channel disabled false
+attr mutable ""
+par PCN.node5.out[1].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node6.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node6.out[0].channel disabled false
+attr mutable ""
+par PCN.node6.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node7.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node7.out[0].channel disabled false
+attr mutable ""
+par PCN.node7.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node7.out[1].channel typename "\"ned.DelayChannel\""
+par PCN.node7.out[1].channel disabled false
+attr mutable ""
+par PCN.node7.out[1].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node8.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node8.out[0].channel disabled false
+attr mutable ""
+par PCN.node8.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node8.out[1].channel typename "\"ned.DelayChannel\""
+par PCN.node8.out[1].channel disabled false
+attr mutable ""
+par PCN.node8.out[1].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node9.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node9.out[0].channel disabled false
+attr mutable ""
+par PCN.node9.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node9.out[1].channel typename "\"ned.DelayChannel\""
+par PCN.node9.out[1].channel disabled false
+attr mutable ""
+par PCN.node9.out[1].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node9.out[2].channel typename "\"ned.DelayChannel\""
+par PCN.node9.out[2].channel disabled false
+attr mutable ""
+par PCN.node9.out[2].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node10.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node10.out[0].channel disabled false
+attr mutable ""
+par PCN.node10.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node10.out[1].channel typename "\"ned.DelayChannel\""
+par PCN.node10.out[1].channel disabled false
+attr mutable ""
+par PCN.node10.out[1].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node11.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node11.out[0].channel disabled false
+attr mutable ""
+par PCN.node11.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node11.out[1].channel typename "\"ned.DelayChannel\""
+par PCN.node11.out[1].channel disabled false
+attr mutable ""
+par PCN.node11.out[1].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node12.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node12.out[0].channel disabled false
+attr mutable ""
+par PCN.node12.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node12.out[1].channel typename "\"ned.DelayChannel\""
+par PCN.node12.out[1].channel disabled false
+attr mutable ""
+par PCN.node12.out[1].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node12.out[2].channel typename "\"ned.DelayChannel\""
+par PCN.node12.out[2].channel disabled false
+attr mutable ""
+par PCN.node12.out[2].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node13.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node13.out[0].channel disabled false
+attr mutable ""
+par PCN.node13.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node14.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node14.out[0].channel disabled false
+attr mutable ""
+par PCN.node14.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node15.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node15.out[0].channel disabled false
+attr mutable ""
+par PCN.node15.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node16.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node16.out[0].channel disabled false
+attr mutable ""
+par PCN.node16.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node17.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node17.out[0].channel disabled false
+attr mutable ""
+par PCN.node17.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node18.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node18.out[0].channel disabled false
+attr mutable ""
+par PCN.node18.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node19.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node19.out[0].channel disabled false
+attr mutable ""
+par PCN.node19.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node20.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node20.out[0].channel disabled false
+attr mutable ""
+par PCN.node20.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node21.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node21.out[0].channel disabled false
+attr mutable ""
+par PCN.node21.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node22.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node22.out[0].channel disabled false
+attr mutable ""
+par PCN.node22.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node23.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node23.out[0].channel disabled false
+attr mutable ""
+par PCN.node23.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.node24.out[0].channel typename "\"ned.DelayChannel\""
+par PCN.node24.out[0].channel disabled false
+attr mutable ""
+par PCN.node24.out[0].channel delay 100s
+attr mutable ""
+attr unit s
+par PCN.netBuilder typename "\"NetBuilder\""
+par PCN.netBuilder topologyFile "\"../topologies/topology\""
+par PCN.netBuilder workloadFile "\"../workloads/random-workload.txt\""
+par PCN.node0 typename "\"FullNode\""
+statistic PCN.node0 node0-to-node6:capacity:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+attr title "Capacity of payment channels from node0-to-node6"
+statistic PCN.node0 node0-to-node2:capacity:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+attr title "Capacity of payment channels from node0-to-node2"
+statistic PCN.node0 node0-to-node1:capacity:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+attr title "Capacity of payment channels from node0-to-node1"
+statistic PCN.node0 paymentGoodputAll:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node0 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node0 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node0 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node0 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node1 typename "\"FullNode\""
+statistic PCN.node1 node1-to-node9:capacity:stats
+field count 1
+field mean 20.15
+field stddev nan
+field min 20.15
+field max 20.15
+field sum 20.15
+field sqrsum 406.0225
+attr recordingmode stats
+attr title "Capacity of payment channels from node1-to-node9"
+statistic PCN.node1 node1-to-node4:capacity:stats
+field count 1
+field mean 1066
+field stddev nan
+field min 1066
+field max 1066
+field sum 1066
+field sqrsum 1136356
+attr recordingmode stats
+attr title "Capacity of payment channels from node1-to-node4"
+statistic PCN.node1 node1-to-node2:capacity:stats
+field count 1
+field mean 19
+field stddev nan
+field min 19
+field max 19
+field sum 19
+field sqrsum 361
+attr recordingmode stats
+attr title "Capacity of payment channels from node1-to-node2"
+statistic PCN.node1 node1-to-node0:capacity:stats
+field count 1
+field mean 856
+field stddev nan
+field min 856
+field max 856
+field sum 856
+field sqrsum 732736
+attr recordingmode stats
+attr title "Capacity of payment channels from node1-to-node0"
+statistic PCN.node1 paymentGoodputAll:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node1 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node1 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node1 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node1 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node2 typename "\"FullNode\""
+statistic PCN.node2 node2-to-node8:capacity:stats
+field count 1
+field mean 99.11
+field stddev nan
+field min 99.11
+field max 99.11
+field sum 99.11
+field sqrsum 9822.7921
+attr recordingmode stats
+attr title "Capacity of payment channels from node2-to-node8"
+statistic PCN.node2 node2-to-node7:capacity:stats
+field count 1
+field mean 32
+field stddev nan
+field min 32
+field max 32
+field sum 32
+field sqrsum 1024
+attr recordingmode stats
+attr title "Capacity of payment channels from node2-to-node7"
+statistic PCN.node2 node2-to-node5:capacity:stats
+field count 1
+field mean 860.99
+field stddev nan
+field min 860.99
+field max 860.99
+field sum 860.99
+field sqrsum 741303.7801
+attr recordingmode stats
+attr title "Capacity of payment channels from node2-to-node5"
+statistic PCN.node2 node2-to-node3:capacity:stats
+field count 2
+field mean 417.2
+field stddev 10.606601717798
+field min 409.7
+field max 424.7
+field sum 834.4
+field sqrsum 348224.18
+attr recordingmode stats
+attr title "Capacity of payment channels from node2-to-node3"
+statistic PCN.node2 node2-to-node19:capacity:stats
+field count 2
+field mean 81.02
+field stddev 0
+field min 81.02
+field max 81.02
+field sum 162.04
+field sqrsum 13128.4808
+attr recordingmode stats
+attr title "Capacity of payment channels from node2-to-node19"
+statistic PCN.node2 node2-to-node16:capacity:stats
+field count 2
+field mean 250.65
+field stddev 3.7476659402904
+field min 248
+field max 253.3
+field sum 501.3
+field sqrsum 125664.89
+attr recordingmode stats
+attr title "Capacity of payment channels from node2-to-node16"
+statistic PCN.node2 node2-to-node15:capacity:stats
+field count 1
+field mean 178.98
+field stddev nan
+field min 178.98
+field max 178.98
+field sum 178.98
+field sqrsum 32033.8404
+attr recordingmode stats
+attr title "Capacity of payment channels from node2-to-node15"
+statistic PCN.node2 node2-to-node10:capacity:stats
+field count 3
+field mean 81.573333333333
+field stddev 19.994475070212
+field min 59.31
+field max 98
+field sum 244.72
+field sqrsum 20762.1842
+attr recordingmode stats
+attr title "Capacity of payment channels from node2-to-node10"
+statistic PCN.node2 node2-to-node1:capacity:stats
+field count 3
+field mean 151.05
+field stddev 14.847811286516
+field min 134.15
+field max 162
+field sum 453.15
+field sqrsum 68889.2225
+attr recordingmode stats
+attr title "Capacity of payment channels from node2-to-node1"
+statistic PCN.node2 node2-to-node0:capacity:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+attr title "Capacity of payment channels from node2-to-node0"
+statistic PCN.node2 paymentGoodputAll:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node2 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node2 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node2 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node2 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node6 typename "\"FullNode\""
+statistic PCN.node6 node6-to-node0:capacity:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+attr title "Capacity of payment channels from node6-to-node0"
+statistic PCN.node6 paymentGoodputAll:stats
+field count 1
+field mean 0
+field stddev nan
+field min 0
+field max 0
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node6 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node6 canceledPayments:stats
+field count 1
+field mean 1
+field stddev nan
+field min 1
+field max 1
+field sum 1
+field sqrsum 1
+attr recordingmode stats
+statistic PCN.node6 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node6 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node4 typename "\"FullNode\""
+statistic PCN.node4 node4-to-node1:capacity:stats
+field count 1
+field mean 440
+field stddev nan
+field min 440
+field max 440
+field sum 440
+field sqrsum 193600
+attr recordingmode stats
+attr title "Capacity of payment channels from node4-to-node1"
+statistic PCN.node4 paymentGoodputAll:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node4 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node4 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node4 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node4 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node9 typename "\"FullNode\""
+statistic PCN.node9 node9-to-node22:capacity:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+attr title "Capacity of payment channels from node9-to-node22"
+statistic PCN.node9 node9-to-node12:capacity:stats
+field count 1
+field mean 422.55
+field stddev nan
+field min 422.55
+field max 422.55
+field sum 422.55
+field sqrsum 178548.5025
+attr recordingmode stats
+attr title "Capacity of payment channels from node9-to-node12"
+statistic PCN.node9 node9-to-node1:capacity:stats
+field count 1
+field mean 2.82
+field stddev nan
+field min 2.82
+field max 2.82
+field sum 2.82
+field sqrsum 7.9524
+attr recordingmode stats
+attr title "Capacity of payment channels from node9-to-node1"
+statistic PCN.node9 paymentGoodputAll:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node9 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node9 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node9 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node9 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node3 typename "\"FullNode\""
+statistic PCN.node3 node3-to-node20:capacity:stats
+field count 1
+field mean 1307.7
+field stddev nan
+field min 1307.7
+field max 1307.7
+field sum 1307.7
+field sqrsum 1710079.29
+attr recordingmode stats
+attr title "Capacity of payment channels from node3-to-node20"
+statistic PCN.node3 node3-to-node2:capacity:stats
+field count 4
+field mean 80.6275
+field stddev 7.5755588352719
+field min 74.79
+field max 91.3
+field sum 322.51
+field sqrsum 26175.3423
+attr recordingmode stats
+attr title "Capacity of payment channels from node3-to-node2"
+statistic PCN.node3 node3-to-node11:capacity:stats
+field count 1
+field mean 372
+field stddev nan
+field min 372
+field max 372
+field sum 372
+field sqrsum 138384
+attr recordingmode stats
+attr title "Capacity of payment channels from node3-to-node11"
+statistic PCN.node3 paymentGoodputAll:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node3 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node3 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node3 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node3 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node7 typename "\"FullNode\""
+statistic PCN.node7 node7-to-node2:capacity:stats
+field count 1
+field mean 442
+field stddev nan
+field min 442
+field max 442
+field sum 442
+field sqrsum 195364
+attr recordingmode stats
+attr title "Capacity of payment channels from node7-to-node2"
+statistic PCN.node7 node7-to-node14:capacity:stats
+field count 1
+field mean 871
+field stddev nan
+field min 871
+field max 871
+field sum 871
+field sqrsum 758641
+attr recordingmode stats
+attr title "Capacity of payment channels from node7-to-node14"
+statistic PCN.node7 paymentGoodputAll:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node7 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node7 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node7 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node7 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node8 typename "\"FullNode\""
+statistic PCN.node8 node8-to-node24:capacity:stats
+field count 1
+field mean 125.11
+field stddev nan
+field min 125.11
+field max 125.11
+field sum 125.11
+field sqrsum 15652.5121
+attr recordingmode stats
+attr title "Capacity of payment channels from node8-to-node24"
+statistic PCN.node8 node8-to-node2:capacity:stats
+field count 2
+field mean 173.095
+field stddev 2.7506453788159
+field min 171.15
+field max 175.04
+field sum 346.19
+field sqrsum 59931.3241
+attr recordingmode stats
+attr title "Capacity of payment channels from node8-to-node2"
+statistic PCN.node8 paymentGoodputAll:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node8 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node8 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node8 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node8 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node10 typename "\"FullNode\""
+statistic PCN.node10 node10-to-node2:capacity:stats
+field count 2
+field mean 68.5
+field stddev 10.606601717798
+field min 61
+field max 76
+field sum 137
+field sqrsum 9497
+attr recordingmode stats
+attr title "Capacity of payment channels from node10-to-node2"
+statistic PCN.node10 node10-to-node17:capacity:stats
+field count 3
+field mean 854.57333333333
+field stddev 19.994475070217
+field min 832.31
+field max 871
+field sum 2563.72
+field sqrsum 2191686.3042
+attr recordingmode stats
+attr title "Capacity of payment channels from node10-to-node17"
+statistic PCN.node10 paymentGoodputAll:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node10 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node10 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node10 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node10 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node15 typename "\"FullNode\""
+statistic PCN.node15 node15-to-node2:capacity:stats
+field count 2
+field mean 7164.195
+field stddev 39.350492372933
+field min 7136.37
+field max 7192.02
+field sum 14328.39
+field sqrsum 102652928.4573
+attr recordingmode stats
+attr title "Capacity of payment channels from node15-to-node2"
+statistic PCN.node15 paymentGoodputAll:stats
+field count 1
+field mean 1
+field stddev nan
+field min 1
+field max 1
+field sum 1
+field sqrsum 1
+attr recordingmode stats
+statistic PCN.node15 paymentGoodputSent:stats
+field count 1
+field mean 1
+field stddev nan
+field min 1
+field max 1
+field sum 1
+field sqrsum 1
+attr recordingmode stats
+statistic PCN.node15 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node15 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node15 completedPayments:stats
+field count 1
+field mean 1
+field stddev nan
+field min 1
+field max 1
+field sum 1
+field sqrsum 1
+attr recordingmode stats
+par PCN.node16 typename "\"FullNode\""
+statistic PCN.node16 node16-to-node2:capacity:stats
+field count 2
+field mean 42.7
+field stddev 7.0710678118655
+field min 37.7
+field max 47.7
+field sum 85.4
+field sqrsum 3696.58
+attr recordingmode stats
+attr title "Capacity of payment channels from node16-to-node2"
+statistic PCN.node16 paymentGoodputAll:stats
+field count 1
+field mean 1
+field stddev nan
+field min 1
+field max 1
+field sum 1
+field sqrsum 1
+attr recordingmode stats
+statistic PCN.node16 paymentGoodputSent:stats
+field count 1
+field mean 1
+field stddev nan
+field min 1
+field max 1
+field sum 1
+field sqrsum 1
+attr recordingmode stats
+statistic PCN.node16 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node16 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node16 completedPayments:stats
+field count 1
+field mean 1
+field stddev nan
+field min 1
+field max 1
+field sum 1
+field sqrsum 1
+attr recordingmode stats
+par PCN.node19 typename "\"FullNode\""
+statistic PCN.node19 node19-to-node2:capacity:stats
+field count 4
+field mean 430.0275
+field stddev 22.699288351546
+field min 402.38
+field max 457.98
+field sum 1720.11
+field sqrsum 741240.3761
+attr recordingmode stats
+attr title "Capacity of payment channels from node19-to-node2"
+statistic PCN.node19 paymentGoodputAll:stats
+field count 1
+field mean 0
+field stddev nan
+field min 0
+field max 0
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node19 paymentGoodputSent:stats
+field count 1
+field mean 0
+field stddev nan
+field min 0
+field max 0
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node19 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node19 failedPayments:stats
+field count 1
+field mean 1
+field stddev nan
+field min 1
+field max 1
+field sum 1
+field sqrsum 1
+attr recordingmode stats
+statistic PCN.node19 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node5 typename "\"FullNode\""
+statistic PCN.node5 node5-to-node2:capacity:stats
+field count 1
+field mean 13.11
+field stddev nan
+field min 13.11
+field max 13.11
+field sum 13.11
+field sqrsum 171.8721
+attr recordingmode stats
+attr title "Capacity of payment channels from node5-to-node2"
+statistic PCN.node5 node5-to-node18:capacity:stats
+field count 1
+field mean 7219.99
+field stddev nan
+field min 7219.99
+field max 7219.99
+field sum 7219.99
+field sqrsum 52128255.6001
+attr recordingmode stats
+attr title "Capacity of payment channels from node5-to-node18"
+statistic PCN.node5 paymentGoodputAll:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node5 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node5 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node5 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node5 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node11 typename "\"FullNode\""
+statistic PCN.node11 node11-to-node3:capacity:stats
+field count 2
+field mean 18.95
+field stddev 0.65053823869167
+field min 18.49
+field max 19.41
+field sum 37.9
+field sqrsum 718.6282
+attr recordingmode stats
+attr title "Capacity of payment channels from node11-to-node3"
+statistic PCN.node11 node11-to-node21:capacity:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+attr title "Capacity of payment channels from node11-to-node21"
+statistic PCN.node11 paymentGoodputAll:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node11 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node11 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node11 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node11 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node20 typename "\"FullNode\""
+statistic PCN.node20 node20-to-node3:capacity:stats
+field count 2
+field mean 45.8
+field stddev 3.5355339059327
+field min 43.3
+field max 48.3
+field sum 91.6
+field sqrsum 4207.78
+attr recordingmode stats
+attr title "Capacity of payment channels from node20-to-node3"
+statistic PCN.node20 paymentGoodputAll:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node20 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node20 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node20 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node20 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node18 typename "\"FullNode\""
+statistic PCN.node18 node18-to-node5:capacity:stats
+field count 1
+field mean 1072.11
+field stddev nan
+field min 1072.11
+field max 1072.11
+field sum 1072.11
+field sqrsum 1149419.8521
+attr recordingmode stats
+attr title "Capacity of payment channels from node18-to-node5"
+statistic PCN.node18 paymentGoodputAll:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node18 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node18 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node18 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node18 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node14 typename "\"FullNode\""
+statistic PCN.node14 node14-to-node7:capacity:stats
+field count 2
+field mean 2032.5
+field stddev 154.85638507985
+field min 1923
+field max 2142
+field sum 4065
+field sqrsum 8286093
+attr recordingmode stats
+attr title "Capacity of payment channels from node14-to-node7"
+statistic PCN.node14 paymentGoodputAll:stats
+field count 1
+field mean 1
+field stddev nan
+field min 1
+field max 1
+field sum 1
+field sqrsum 1
+attr recordingmode stats
+statistic PCN.node14 paymentGoodputSent:stats
+field count 1
+field mean 1
+field stddev nan
+field min 1
+field max 1
+field sum 1
+field sqrsum 1
+attr recordingmode stats
+statistic PCN.node14 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node14 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node14 completedPayments:stats
+field count 1
+field mean 1
+field stddev nan
+field min 1
+field max 1
+field sum 1
+field sqrsum 1
+attr recordingmode stats
+par PCN.node24 typename "\"FullNode\""
+statistic PCN.node24 node24-to-node8:capacity:stats
+field count 2
+field mean 2045.095
+field stddev 2.7506453785659
+field min 2043.15
+field max 2047.04
+field sum 4090.19
+field sqrsum 8364834.6841
+attr recordingmode stats
+attr title "Capacity of payment channels from node24-to-node8"
+statistic PCN.node24 paymentGoodputAll:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node24 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node24 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node24 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node24 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node12 typename "\"FullNode\""
+statistic PCN.node12 node12-to-node9:capacity:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+attr title "Capacity of payment channels from node12-to-node9"
+statistic PCN.node12 node12-to-node23:capacity:stats
+field count 3
+field mean 755.51666666667
+field stddev 4.301259505438
+field min 750.55
+field max 758
+field sum 2266.55
+field sqrsum 1712453.3025
+attr recordingmode stats
+attr title "Capacity of payment channels from node12-to-node23"
+statistic PCN.node12 node12-to-node13:capacity:stats
+field count 2
+field mean 2148
+field stddev 0
+field min 2148
+field max 2148
+field sum 4296
+field sqrsum 9227808
+attr recordingmode stats
+attr title "Capacity of payment channels from node12-to-node13"
+statistic PCN.node12 paymentGoodputAll:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node12 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node12 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node12 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node12 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node22 typename "\"FullNode\""
+statistic PCN.node22 node22-to-node9:capacity:stats
+field count 2
+field mean 21508.46
+field stddev 4.3699199065107
+field min 21505.37
+field max 21511.55
+field sum 43016.92
+field sqrsum 925227722.2394
+attr recordingmode stats
+attr title "Capacity of payment channels from node22-to-node9"
+statistic PCN.node22 paymentGoodputAll:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node22 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node22 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node22 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node22 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node17 typename "\"FullNode\""
+statistic PCN.node17 node17-to-node10:capacity:stats
+field count 2
+field mean 25.5
+field stddev 10.606601717798
+field min 18
+field max 33
+field sum 51
+field sqrsum 1413
+attr recordingmode stats
+attr title "Capacity of payment channels from node17-to-node10"
+statistic PCN.node17 paymentGoodputAll:stats
+field count 2
+field mean 0.25
+field stddev 0.35355339059327
+field min 0
+field max 0.5
+field sum 0.5
+field sqrsum 0.25
+attr recordingmode stats
+statistic PCN.node17 paymentGoodputSent:stats
+field count 1
+field mean 1
+field stddev nan
+field min 1
+field max 1
+field sum 1
+field sqrsum 1
+attr recordingmode stats
+statistic PCN.node17 canceledPayments:stats
+field count 1
+field mean 1
+field stddev nan
+field min 1
+field max 1
+field sum 1
+field sqrsum 1
+attr recordingmode stats
+statistic PCN.node17 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node17 completedPayments:stats
+field count 1
+field mean 1
+field stddev nan
+field min 1
+field max 1
+field sum 1
+field sqrsum 1
+attr recordingmode stats
+par PCN.node21 typename "\"FullNode\""
+statistic PCN.node21 node21-to-node11:capacity:stats
+field count 2
+field mean 2140.95
+field stddev 0.6505382401828
+field min 2140.49
+field max 2141.41
+field sum 4281.9
+field sqrsum 9167334.2282
+attr recordingmode stats
+attr title "Capacity of payment channels from node21-to-node11"
+statistic PCN.node21 paymentGoodputAll:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node21 paymentGoodputSent:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node21 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node21 failedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node21 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node13 typename "\"FullNode\""
+statistic PCN.node13 node13-to-node12:capacity:stats
+field count 2
+field mean 91.47
+field stddev 10.649028124669
+field min 83.94
+field max 99
+field sum 182.94
+field sqrsum 16846.9236
+attr recordingmode stats
+attr title "Capacity of payment channels from node13-to-node12"
+statistic PCN.node13 paymentGoodputAll:stats
+field count 2
+field mean 0
+field stddev 0
+field min 0
+field max 0
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node13 paymentGoodputSent:stats
+field count 2
+field mean 0
+field stddev 0
+field min 0
+field max 0
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node13 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node13 failedPayments:stats
+field count 2
+field mean 1.5
+field stddev 0.70710678118655
+field min 1
+field max 2
+field sum 3
+field sqrsum 5
+attr recordingmode stats
+statistic PCN.node13 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN.node23 typename "\"FullNode\""
+statistic PCN.node23 node23-to-node12:capacity:stats
+field count 2
+field mean 386.96
+field stddev 328.1823992843
+field min 154.9
+field max 619.02
+field sum 773.92
+field sqrsum 407179.7704
+attr recordingmode stats
+attr title "Capacity of payment channels from node23-to-node12"
+statistic PCN.node23 paymentGoodputAll:stats
+field count 2
+field mean 0
+field stddev 0
+field min 0
+field max 0
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node23 paymentGoodputSent:stats
+field count 2
+field mean 0
+field stddev 0
+field min 0
+field max 0
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node23 canceledPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+statistic PCN.node23 failedPayments:stats
+field count 2
+field mean 1.5
+field stddev 0.70710678118655
+field min 1
+field max 2
+field sum 3
+field sqrsum 5
+attr recordingmode stats
+statistic PCN.node23 completedPayments:stats
+field count 0
+field mean -nan
+field stddev nan
+field min nan
+field max nan
+field sum 0
+field sqrsum 0
+attr recordingmode stats
+par PCN typename "\"PCN\""
+

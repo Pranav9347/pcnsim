@@ -110,8 +110,8 @@ def get_end_hosts_list(graph, complete):
     end_hosts = []
     if (complete == False):
         for node in graph.nodes():
-            if (graph.degree(node) == 1):
-                end_hosts.append(node)
+            #if (graph.degree(node) == 1):
+            end_hosts.append(node)
     else:
         for node in graph.nodes():
             end_hosts.append(node)

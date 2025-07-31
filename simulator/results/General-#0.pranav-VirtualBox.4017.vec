@@ -1,0 +1,255 @@
+version 3
+run General-0-20250624-20:41:03-4017
+attr configname General
+attr datetime 20250624-20:41:03
+attr datetimef 20250624-204103
+attr experiment General
+attr inifile pCN.ini
+attr iterationvars ""
+attr iterationvarsd ""
+attr iterationvarsf ""
+attr measurement ""
+attr network PCN
+attr processid 4017
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+config network PCN
+config fname-append-host true
+config result-dir results
+
+vector 0 PCN.node0 completedPayments:vector ETV
+attr recordingmode vector
+vector 1 PCN.node0 failedPayments:vector ETV
+attr recordingmode vector
+vector 2 PCN.node0 canceledPayments:vector ETV
+attr recordingmode vector
+vector 3 PCN.node0 paymentGoodputSent:vector ETV
+attr recordingmode vector
+vector 4 PCN.node0 paymentGoodputAll:vector ETV
+attr recordingmode vector
+vector 5 PCN.node1 completedPayments:vector ETV
+attr recordingmode vector
+vector 6 PCN.node1 failedPayments:vector ETV
+attr recordingmode vector
+vector 7 PCN.node1 canceledPayments:vector ETV
+attr recordingmode vector
+vector 8 PCN.node1 paymentGoodputSent:vector ETV
+attr recordingmode vector
+vector 9 PCN.node1 paymentGoodputAll:vector ETV
+attr recordingmode vector
+vector 10 PCN.node2 completedPayments:vector ETV
+attr recordingmode vector
+vector 11 PCN.node2 failedPayments:vector ETV
+attr recordingmode vector
+vector 12 PCN.node2 canceledPayments:vector ETV
+attr recordingmode vector
+vector 13 PCN.node2 paymentGoodputSent:vector ETV
+attr recordingmode vector
+vector 14 PCN.node2 paymentGoodputAll:vector ETV
+attr recordingmode vector
+vector 15 PCN.node3 completedPayments:vector ETV
+attr recordingmode vector
+vector 16 PCN.node3 failedPayments:vector ETV
+attr recordingmode vector
+vector 17 PCN.node3 canceledPayments:vector ETV
+attr recordingmode vector
+vector 18 PCN.node3 paymentGoodputSent:vector ETV
+attr recordingmode vector
+vector 19 PCN.node3 paymentGoodputAll:vector ETV
+attr recordingmode vector
+vector 20 PCN.node4 completedPayments:vector ETV
+attr recordingmode vector
+vector 21 PCN.node4 failedPayments:vector ETV
+attr recordingmode vector
+vector 22 PCN.node4 canceledPayments:vector ETV
+attr recordingmode vector
+vector 23 PCN.node4 paymentGoodputSent:vector ETV
+attr recordingmode vector
+vector 24 PCN.node4 paymentGoodputAll:vector ETV
+attr recordingmode vector
+vector 25 PCN.node5 completedPayments:vector ETV
+attr recordingmode vector
+vector 26 PCN.node5 failedPayments:vector ETV
+attr recordingmode vector
+vector 27 PCN.node5 canceledPayments:vector ETV
+attr recordingmode vector
+vector 28 PCN.node5 paymentGoodputSent:vector ETV
+attr recordingmode vector
+vector 29 PCN.node5 paymentGoodputAll:vector ETV
+attr recordingmode vector
+vector 30 PCN.node6 completedPayments:vector ETV
+attr recordingmode vector
+vector 31 PCN.node6 failedPayments:vector ETV
+attr recordingmode vector
+vector 32 PCN.node6 canceledPayments:vector ETV
+attr recordingmode vector
+vector 33 PCN.node6 paymentGoodputSent:vector ETV
+attr recordingmode vector
+vector 34 PCN.node6 paymentGoodputAll:vector ETV
+attr recordingmode vector
+vector 35 PCN.node7 completedPayments:vector ETV
+attr recordingmode vector
+vector 36 PCN.node7 failedPayments:vector ETV
+attr recordingmode vector
+vector 37 PCN.node7 canceledPayments:vector ETV
+attr recordingmode vector
+vector 38 PCN.node7 paymentGoodputSent:vector ETV
+attr recordingmode vector
+vector 39 PCN.node7 paymentGoodputAll:vector ETV
+attr recordingmode vector
+vector 40 PCN.node8 completedPayments:vector ETV
+attr recordingmode vector
+vector 41 PCN.node8 failedPayments:vector ETV
+attr recordingmode vector
+vector 42 PCN.node8 canceledPayments:vector ETV
+attr recordingmode vector
+vector 43 PCN.node8 paymentGoodputSent:vector ETV
+attr recordingmode vector
+vector 44 PCN.node8 paymentGoodputAll:vector ETV
+attr recordingmode vector
+vector 45 PCN.node9 completedPayments:vector ETV
+attr recordingmode vector
+vector 46 PCN.node9 failedPayments:vector ETV
+attr recordingmode vector
+vector 47 PCN.node9 canceledPayments:vector ETV
+attr recordingmode vector
+vector 48 PCN.node9 paymentGoodputSent:vector ETV
+attr recordingmode vector
+vector 49 PCN.node9 paymentGoodputAll:vector ETV
+attr recordingmode vector
+vector 50 PCN.node0 node0-to-node1:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node0-to-node1"
+vector 51 PCN.node0 node0-to-node2:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node0-to-node2"
+vector 52 PCN.node0 node0-to-node4:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node0-to-node4"
+vector 53 PCN.node0 node0-to-node9:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node0-to-node9"
+vector 54 PCN.node1 node1-to-node0:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node1-to-node0"
+vector 55 PCN.node1 node1-to-node2:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node1-to-node2"
+vector 56 PCN.node1 node1-to-node3:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node1-to-node3"
+vector 57 PCN.node1 node1-to-node6:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node1-to-node6"
+vector 58 PCN.node2 node2-to-node0:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node2-to-node0"
+vector 59 PCN.node2 node2-to-node1:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node2-to-node1"
+vector 60 PCN.node2 node2-to-node7:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node2-to-node7"
+vector 61 PCN.node2 node2-to-node8:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node2-to-node8"
+vector 62 PCN.node3 node3-to-node1:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node3-to-node1"
+vector 63 PCN.node4 node4-to-node0:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node4-to-node0"
+vector 64 PCN.node4 node4-to-node5:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node4-to-node5"
+vector 65 PCN.node5 node5-to-node4:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node5-to-node4"
+vector 66 PCN.node6 node6-to-node1:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node6-to-node1"
+vector 67 PCN.node7 node7-to-node2:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node7-to-node2"
+vector 68 PCN.node8 node8-to-node2:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node8-to-node2"
+vector 69 PCN.node9 node9-to-node0:capacity:vector ETV
+attr recordingmode vector
+attr title "Capacity of payment channels from node9-to-node0"
+15	195	1060	1
+18	195	1060	1
+19	195	1060	1
+27	116	780	1
+27	134	821	2
+27	154	910	3
+27	193	1058	4
+29	116	780	0
+29	134	821	0
+29	154	910	0
+29	193	1058	0
+36	110	760	1
+38	110	760	0
+39	110	760	0
+40	212	1115	1
+42	13	262	1
+42	15	266	2
+42	176	970	3
+42	213	1138	4
+43	212	1115	1
+44	13	262	0
+44	15	266	0
+44	176	970	0
+44	212	1115	0.25
+44	213	1138	0.2
+51	94	709.5	7183.67
+51	149	891.5	7174.39
+51	156	910	7177.39
+51	191	1044	7177.39
+53	87	667.5	19
+55	36	458.5	260
+55	45	467.5	257
+55	76	643.5	207
+55	101	714.5	100.6
+55	163	915	108.3
+56	153	909.5	7183.67
+56	171	960	7267.67
+57	85	665.5	121.3
+57	206	1110	124.3
+57	219	1160.5	230.7
+58	65	567.5	858
+58	107	743.5	808
+59	61	565.5	164.3
+59	123	809.5	127.97
+59	141	860	211.97
+59	182	1010	214.97
+59	197	1060.5	321.37
+59	216	1144	321.37
+60	56	558.5	2068
+60	131	814.5	1961.6
+60	142	860	1961.6
+61	178	991.5	98.72
+61	188	1015	106.42
+62	22	358.5	2929
+63	210	1114.5	721
+65	185	1014.5	12
+65	200	1061.5	2.28
+66	28	367.5	965
+66	53	543.5	915
+66	72	614.5	808.6
+66	132	815	816.3
+67	58	559.5	37.13
+67	110	760	188
+67	172	960.5	294.4
+68	41	465.5	3.3
+69	69	609.5	3406.67
+69	118	791.5	3397.39
+69	126	810	3400.39
+30	229	1210	1
+33	229	1210	1
+34	229	1210	1
+62	230	1210	2965.33
+

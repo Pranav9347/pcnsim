@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by opp_msgtool 6.0 from commitmentSigned.msg.
+// Generated file, do not edit! Created by opp_msgtool 6.1 from commitmentSigned.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
