@@ -26,3 +26,7 @@ message MergeAckMsg {
 message MergeNackMsg {
     string sender;
 }
+
+message MergeAcceptMsg {
+    string sender;
+}

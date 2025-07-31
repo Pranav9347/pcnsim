@@ -48,6 +48,9 @@ struct PathMetrics {
 
 using namespace omnetpp;
 class FullNode : public cSimpleModule {
+    private:
+    bool hasMergedThisRound;
+    std::map<std::string, double> deltaSByNeighbor;
 
     protected:
         // Protected data structures
@@ -119,13 +122,19 @@ class FullNode : public cSimpleModule {
         double _paymentGoodputSent = 0;
         double _paymentGoodputAll = 0;
         // --- Cluster-Based Routing Protocol ---
+int countAllInterClusterEdges();
+bool areNeighbors(const std::string& nodeA, const std::string& nodeB);
+int countInterClusterEdges(const std::set<std::string>& clusterA, const std::set<std::string>& clusterB);
 int countClusterEdges(const std::set<std::string>& members);
+void onAllClusterInfoReceived();
 void runClusteringRound();
 void sendClusterInfoTo(const std::string& neighbor);
 ClusterInfo waitForClusterInfoFrom(const std::string& neighbor);
-double computeDeltaS(const ClusterInfo& local, const ClusterInfo& remote);
+double computeDeltaS(const std::set<std::string>& clusterA,
+                               const std::set<std::string>& clusterB);
 void sendMergeRequest(const std::string& targetCIP);
 void handleMergeRequest(MergeRequestMsg* msg);
+void handleMergeAccept(MergeAcceptMsg* msg);
 void handleMergeAck(MergeAckMsg* msg);
 void handleMergeNack(MergeNackMsg* msg);
 bool receivedMutualMergeRequest(const std::string& targetCIP);
@@ -139,8 +148,14 @@ std::vector<PathMetrics> probeCandidatePaths(const std::vector<std::vector<std::
 PathMetrics selectOptimalRouteLP(const std::vector<PathMetrics>& candidatePaths, double paymentAmount);
 
 // --- Clustering State ---
+
 std::string clusterID;
 std::string CIP;
+// clusterID → set of node names
+std::map<std::string, std::set<std::string>> clusterIDToMembers;
+// Merge coordination
+std::string sentMergeRequestTo;                     // Whom I asked to merge with
+std::set<std::string> receivedMergeRequests;        // Who asked me to merge
 std::set<std::string> clusterMembers;
 std::set<std::string> intraClusterNeighbors;
 std::set<std::string> interClusterNeighbors;

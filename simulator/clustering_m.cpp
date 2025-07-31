@@ -2108,6 +2108,358 @@ void MergeNackMsgDescriptor::setFieldStructValuePointer(omnetpp::any_ptr object,
     }
 }
 
+Register_Class(MergeAcceptMsg)
+
+MergeAcceptMsg::MergeAcceptMsg(const char *name, short kind) : ::omnetpp::cMessage(name, kind)
+{
+}
+
+MergeAcceptMsg::MergeAcceptMsg(const MergeAcceptMsg& other) : ::omnetpp::cMessage(other)
+{
+    copy(other);
+}
+
+MergeAcceptMsg::~MergeAcceptMsg()
+{
+}
+
+MergeAcceptMsg& MergeAcceptMsg::operator=(const MergeAcceptMsg& other)
+{
+    if (this == &other) return *this;
+    ::omnetpp::cMessage::operator=(other);
+    copy(other);
+    return *this;
+}
+
+void MergeAcceptMsg::copy(const MergeAcceptMsg& other)
+{
+    this->sender = other.sender;
+}
+
+void MergeAcceptMsg::parsimPack(omnetpp::cCommBuffer *b) const
+{
+    ::omnetpp::cMessage::parsimPack(b);
+    doParsimPacking(b,this->sender);
+}
+
+void MergeAcceptMsg::parsimUnpack(omnetpp::cCommBuffer *b)
+{
+    ::omnetpp::cMessage::parsimUnpack(b);
+    doParsimUnpacking(b,this->sender);
+}
+
+const char * MergeAcceptMsg::getSender() const
+{
+    return this->sender.c_str();
+}
+
+void MergeAcceptMsg::setSender(const char * sender)
+{
+    this->sender = sender;
+}
+
+class MergeAcceptMsgDescriptor : public omnetpp::cClassDescriptor
+{
+  private:
+    mutable const char **propertyNames;
+    enum FieldConstants {
+        FIELD_sender,
+    };
+  public:
+    MergeAcceptMsgDescriptor();
+    virtual ~MergeAcceptMsgDescriptor();
+
+    virtual bool doesSupport(omnetpp::cObject *obj) const override;
+    virtual const char **getPropertyNames() const override;
+    virtual const char *getProperty(const char *propertyName) const override;
+    virtual int getFieldCount() const override;
+    virtual const char *getFieldName(int field) const override;
+    virtual int findField(const char *fieldName) const override;
+    virtual unsigned int getFieldTypeFlags(int field) const override;
+    virtual const char *getFieldTypeString(int field) const override;
+    virtual const char **getFieldPropertyNames(int field) const override;
+    virtual const char *getFieldProperty(int field, const char *propertyName) const override;
+    virtual int getFieldArraySize(omnetpp::any_ptr object, int field) const override;
+    virtual void setFieldArraySize(omnetpp::any_ptr object, int field, int size) const override;
+
+    virtual const char *getFieldDynamicTypeString(omnetpp::any_ptr object, int field, int i) const override;
+    virtual std::string getFieldValueAsString(omnetpp::any_ptr object, int field, int i) const override;
+    virtual void setFieldValueAsString(omnetpp::any_ptr object, int field, int i, const char *value) const override;
+    virtual omnetpp::cValue getFieldValue(omnetpp::any_ptr object, int field, int i) const override;
+    virtual void setFieldValue(omnetpp::any_ptr object, int field, int i, const omnetpp::cValue& value) const override;
+
+    virtual const char *getFieldStructName(int field) const override;
+    virtual omnetpp::any_ptr getFieldStructValuePointer(omnetpp::any_ptr object, int field, int i) const override;
+    virtual void setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const override;
+};
+
+Register_ClassDescriptor(MergeAcceptMsgDescriptor)
+
+MergeAcceptMsgDescriptor::MergeAcceptMsgDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(MergeAcceptMsg)), "omnetpp::cMessage")
+{
+    propertyNames = nullptr;
+}
+
+MergeAcceptMsgDescriptor::~MergeAcceptMsgDescriptor()
+{
+    delete[] propertyNames;
+}
+
+bool MergeAcceptMsgDescriptor::doesSupport(omnetpp::cObject *obj) const
+{
+    return dynamic_cast<MergeAcceptMsg *>(obj)!=nullptr;
+}
+
+const char **MergeAcceptMsgDescriptor::getPropertyNames() const
+{
+    if (!propertyNames) {
+        static const char *names[] = {  nullptr };
+        omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+        const char **baseNames = base ? base->getPropertyNames() : nullptr;
+        propertyNames = mergeLists(baseNames, names);
+    }
+    return propertyNames;
+}
+
+const char *MergeAcceptMsgDescriptor::getProperty(const char *propertyName) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    return base ? base->getProperty(propertyName) : nullptr;
+}
+
+int MergeAcceptMsgDescriptor::getFieldCount() const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    return base ? 1+base->getFieldCount() : 1;
+}
+
+unsigned int MergeAcceptMsgDescriptor::getFieldTypeFlags(int field) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldTypeFlags(field);
+        field -= base->getFieldCount();
+    }
+    static unsigned int fieldTypeFlags[] = {
+        FD_ISEDITABLE,    // FIELD_sender
+    };
+    return (field >= 0 && field < 1) ? fieldTypeFlags[field] : 0;
+}
+
+const char *MergeAcceptMsgDescriptor::getFieldName(int field) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldName(field);
+        field -= base->getFieldCount();
+    }
+    static const char *fieldNames[] = {
+        "sender",
+    };
+    return (field >= 0 && field < 1) ? fieldNames[field] : nullptr;
+}
+
+int MergeAcceptMsgDescriptor::findField(const char *fieldName) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    int baseIndex = base ? base->getFieldCount() : 0;
+    if (strcmp(fieldName, "sender") == 0) return baseIndex + 0;
+    return base ? base->findField(fieldName) : -1;
+}
+
+const char *MergeAcceptMsgDescriptor::getFieldTypeString(int field) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldTypeString(field);
+        field -= base->getFieldCount();
+    }
+    static const char *fieldTypeStrings[] = {
+        "string",    // FIELD_sender
+    };
+    return (field >= 0 && field < 1) ? fieldTypeStrings[field] : nullptr;
+}
+
+const char **MergeAcceptMsgDescriptor::getFieldPropertyNames(int field) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldPropertyNames(field);
+        field -= base->getFieldCount();
+    }
+    switch (field) {
+        default: return nullptr;
+    }
+}
+
+const char *MergeAcceptMsgDescriptor::getFieldProperty(int field, const char *propertyName) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldProperty(field, propertyName);
+        field -= base->getFieldCount();
+    }
+    switch (field) {
+        default: return nullptr;
+    }
+}
+
+int MergeAcceptMsgDescriptor::getFieldArraySize(omnetpp::any_ptr object, int field) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldArraySize(object, field);
+        field -= base->getFieldCount();
+    }
+    MergeAcceptMsg *pp = omnetpp::fromAnyPtr<MergeAcceptMsg>(object); (void)pp;
+    switch (field) {
+        default: return 0;
+    }
+}
+
+void MergeAcceptMsgDescriptor::setFieldArraySize(omnetpp::any_ptr object, int field, int size) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount()){
+            base->setFieldArraySize(object, field, size);
+            return;
+        }
+        field -= base->getFieldCount();
+    }
+    MergeAcceptMsg *pp = omnetpp::fromAnyPtr<MergeAcceptMsg>(object); (void)pp;
+    switch (field) {
+        default: throw omnetpp::cRuntimeError("Cannot set array size of field %d of class 'MergeAcceptMsg'", field);
+    }
+}
+
+const char *MergeAcceptMsgDescriptor::getFieldDynamicTypeString(omnetpp::any_ptr object, int field, int i) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldDynamicTypeString(object,field,i);
+        field -= base->getFieldCount();
+    }
+    MergeAcceptMsg *pp = omnetpp::fromAnyPtr<MergeAcceptMsg>(object); (void)pp;
+    switch (field) {
+        default: return nullptr;
+    }
+}
+
+std::string MergeAcceptMsgDescriptor::getFieldValueAsString(omnetpp::any_ptr object, int field, int i) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldValueAsString(object,field,i);
+        field -= base->getFieldCount();
+    }
+    MergeAcceptMsg *pp = omnetpp::fromAnyPtr<MergeAcceptMsg>(object); (void)pp;
+    switch (field) {
+        case FIELD_sender: return oppstring2string(pp->getSender());
+        default: return "";
+    }
+}
+
+void MergeAcceptMsgDescriptor::setFieldValueAsString(omnetpp::any_ptr object, int field, int i, const char *value) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount()){
+            base->setFieldValueAsString(object, field, i, value);
+            return;
+        }
+        field -= base->getFieldCount();
+    }
+    MergeAcceptMsg *pp = omnetpp::fromAnyPtr<MergeAcceptMsg>(object); (void)pp;
+    switch (field) {
+        case FIELD_sender: pp->setSender((value)); break;
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'MergeAcceptMsg'", field);
+    }
+}
+
+omnetpp::cValue MergeAcceptMsgDescriptor::getFieldValue(omnetpp::any_ptr object, int field, int i) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldValue(object,field,i);
+        field -= base->getFieldCount();
+    }
+    MergeAcceptMsg *pp = omnetpp::fromAnyPtr<MergeAcceptMsg>(object); (void)pp;
+    switch (field) {
+        case FIELD_sender: return pp->getSender();
+        default: throw omnetpp::cRuntimeError("Cannot return field %d of class 'MergeAcceptMsg' as cValue -- field index out of range?", field);
+    }
+}
+
+void MergeAcceptMsgDescriptor::setFieldValue(omnetpp::any_ptr object, int field, int i, const omnetpp::cValue& value) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount()){
+            base->setFieldValue(object, field, i, value);
+            return;
+        }
+        field -= base->getFieldCount();
+    }
+    MergeAcceptMsg *pp = omnetpp::fromAnyPtr<MergeAcceptMsg>(object); (void)pp;
+    switch (field) {
+        case FIELD_sender: pp->setSender(value.stringValue()); break;
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'MergeAcceptMsg'", field);
+    }
+}
+
+const char *MergeAcceptMsgDescriptor::getFieldStructName(int field) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldStructName(field);
+        field -= base->getFieldCount();
+    }
+    switch (field) {
+        default: return nullptr;
+    };
+}
+
+omnetpp::any_ptr MergeAcceptMsgDescriptor::getFieldStructValuePointer(omnetpp::any_ptr object, int field, int i) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount())
+            return base->getFieldStructValuePointer(object, field, i);
+        field -= base->getFieldCount();
+    }
+    MergeAcceptMsg *pp = omnetpp::fromAnyPtr<MergeAcceptMsg>(object); (void)pp;
+    switch (field) {
+        default: return omnetpp::any_ptr(nullptr);
+    }
+}
+
+void MergeAcceptMsgDescriptor::setFieldStructValuePointer(omnetpp::any_ptr object, int field, int i, omnetpp::any_ptr ptr) const
+{
+    omnetpp::cClassDescriptor *base = getBaseClassDescriptor();
+    if (base) {
+        if (field < base->getFieldCount()){
+            base->setFieldStructValuePointer(object, field, i, ptr);
+            return;
+        }
+        field -= base->getFieldCount();
+    }
+    MergeAcceptMsg *pp = omnetpp::fromAnyPtr<MergeAcceptMsg>(object); (void)pp;
+    switch (field) {
+        default: throw omnetpp::cRuntimeError("Cannot set field %d of class 'MergeAcceptMsg'", field);
+    }
+}
+
 namespace omnetpp {
 
 }  // namespace omnetpp

@@ -12,7 +12,8 @@
 #include "clustering_m.h"
 #include "clusterGraph.h"
 #include "Cluster.h"
-
+std::map<std::string, std::string> FullNode::nodeToCluster;
+ClusterGraph FullNode::clusterGraph;
 // Define module and initialize random number generator
 Define_Module(FullNode);
 
@@ -26,13 +27,20 @@ void FullNode::sendClusterInfoTo(const std::string& neighbor) {
     msg->setSender(getName());
     msg->setClusterID(clusterID.c_str());
     msg->setCIP(CIP.c_str());
-    msg->setNumNodes(1);              // Single node cluster initially
-    msg->setNumEdges(_paymentChannels.size());
-    msg->setMergedNumNodes(1 + 1);    // Conservative default merge size
-    msg->setMergedNumEdges(_paymentChannels.size() + 1); // Dummy
+
+    int clusterNodeCount = clusterMembers.size();  // Real number of nodes in this cluster
+    int intraClusterEdgeCount = countClusterEdges(clusterMembers);  // Actual EC(vi)
+
+    msg->setNumNodes(clusterNodeCount);
+    msg->setNumEdges(intraClusterEdgeCount);
+
+    // These fields are not used anymore, can be set to zero or removed
+    msg->setMergedNumNodes(0);
+    msg->setMergedNumEdges(0);
 
     send(msg, "out", rtable[neighbor]);
 }
+
 
 
 ClusterInfo FullNode::waitForClusterInfoFrom(const std::string& neighbor) {
@@ -49,27 +57,92 @@ ClusterInfo FullNode::waitForClusterInfoFrom(const std::string& neighbor) {
     );
     return ci;
 }
+bool FullNode::areNeighbors(const std::string& nodeA, const std::string& nodeB) {
+    if (nameToPCs.find(nodeA) == nameToPCs.end()) return false;
+    return nameToPCs[nodeA].count(nodeB) > 0;
+}
 
 
-double FullNode::computeDeltaS(const ClusterInfo& local, const ClusterInfo& remote) {
-    int L = local.numEdges + remote.numEdges;
+int FullNode::countInterClusterEdges(const std::set<std::string>& clusterA, const std::set<std::string>& clusterB) {
+    int count = 0;
+    for (const std::string& nodeA : clusterA) {
+        if (nameToPCs.count(nodeA) == 0) continue;
 
-    // Estimate new inter-cluster edges after merging
-    int Lprime = L - 1;  // Remove one inter-cluster link that becomes intra-cluster
+        for (const auto& [neighbor, pc] : nameToPCs[nodeA]) {
+            if (clusterB.count(neighbor)) {
+                count++;
+                EV << "[DEBUG] Inter-cluster edge: " << nodeA << " -- " << neighbor << "\n";
+            }
+        }
+    }
+    return count;
+}
 
-    int V = local.numNodes + remote.numNodes;
 
-    int mergedNumNodes = V;
+int FullNode::countAllInterClusterEdges() {
+    std::set<std::pair<std::string, std::string>> countedEdges;
+    int count = 0;
 
-    // Estimate intra-cluster edges after merging
-    int mergedNumEdges = local.numEdges + remote.numEdges + 1;
+    for (const auto& [nodeA, neighbors] : nameToPCs) {
+        for (const auto& [nodeB, pc] : neighbors) {
+            // Check only one direction to avoid double-counting
+            if (nodeA < nodeB) {
+                std::string clusterA = nodeToCluster[nodeA];
+                std::string clusterB = nodeToCluster[nodeB];
 
-    int term1 = L - Lprime;
-    int term2 = (V - 1) * (local.numNodes * local.numEdges + remote.numNodes * remote.numEdges - mergedNumNodes * mergedNumEdges);
+                if (clusterA != clusterB) {
+                    countedEdges.insert({nodeA, nodeB});
+                    count++;
+                }
+            }
+        }
+    }
 
-    double deltaS = term1 + term2;
+    return count;
+}
+
+
+double FullNode::computeDeltaS(
+    const std::set<std::string>& A_members,
+    const std::set<std::string>& B_members
+) {
+    int V = _localTopology->getNumNodes();
+    if (V == 0) return 0.0; // Avoid division by zero
+
+    // 1. Calculate the change in inter-cluster edges: |L| - |L'|
+    // This is simply the number of edges between cluster A and B that will become intra-cluster.
+    int L_change = countInterClusterEdges(A_members, B_members);
+
+    // 2. Calculate the change in the weighted intra-cluster edge term.
+    int V_A = A_members.size();
+    int E_A = countClusterEdges(A_members);
+
+    int V_B = B_members.size();
+    int E_B = countClusterEdges(B_members);
+
+    std::set<std::string> merged_members = A_members;
+    merged_members.insert(B_members.begin(), B_members.end());
+    int V_merged = merged_members.size();
+    int E_merged = countClusterEdges(merged_members);
+
+    double weighted_edges_before = static_cast<double>(V_A * E_A + V_B * E_B);
+    double weighted_edges_after = static_cast<double>(V_merged * E_merged);
+
+    // 3. Combine the terms according to the paper's formula
+    double deltaS = L_change + (weighted_edges_before - weighted_edges_after) / V;
+
+    EV << "[DEBUG] ΔS with " << (B_members.empty() ? "N/A" : *B_members.begin()) << ":\n"
+       << "  L_change: " << L_change << "\n"
+       << "  V_A=" << V_A << ", E_A=" << E_A << "\n"
+       << "  V_B=" << V_B << ", E_B=" << E_B << "\n"
+       << "  V_merged=" << V_merged << ", E_merged=" << E_merged << "\n"
+       << "  Weighted Term Change: " << (weighted_edges_before - weighted_edges_after) / V << "\n"
+       << "  Final ΔS = " << deltaS << "\n";
+
     return deltaS;
 }
+
+
 
 
 
@@ -81,17 +154,38 @@ void FullNode::sendMergeRequest(const std::string& targetCIP) {
     EV << "[Cluster] Sent MergeRequest to " << targetCIP << "\n";
 }
 
+// In FullNode.cpp
+// In FullNode.cpp
 void FullNode::handleMergeRequest(MergeRequestMsg* msg) {
-    std::string sender = msg->getSender();
-    std::string senderCluster = msg->getClusterID();
-    EV << "[Cluster] Received MergeRequest from " << sender << " (cluster: " << senderCluster << ")\n";
+    std::string proposerName = msg->getSender();
+    EV << "[Cluster] Received MergeRequest from " << proposerName << "\n";
 
-    // Respond with MergeAck if we also want to merge
-    MergeAckMsg* ack = new MergeAckMsg();
-    ack->setSender(getName());
-    ack->setAcceptedCluster(clusterID.c_str());
-    send(ack, "out", rtable[sender]);
-    EV << "[Cluster] Sent MergeAck to " << sender << "\n";
+    // Condition 1: Check if I am still an active CIP and haven't already accepted a merge this round.
+    if (CIP != getName() || hasMergedThisRound) {
+        EV << "[Cluster] REJECTING " << proposerName << " because I am no longer available to merge.\n";
+        MergeNackMsg* nackMsg = new MergeNackMsg();
+        nackMsg->setSender(getName());
+        send(nackMsg, "out", rtable[proposerName]);
+        delete msg;
+        return;
+    }
+
+    // Condition 2: Check if merging with the proposer is beneficial (i.e., has a positive deltaS).
+    if (deltaSByNeighbor.count(proposerName) && deltaSByNeighbor.at(proposerName) > 0) {
+        EV << "[Cluster] ACCEPTING proposal from " << proposerName << ". Locking myself and sending accept.\n";
+        hasMergedThisRound = true; // Lock myself from other offers this round.
+
+        // Send the acceptance message back to the proposer.
+        MergeAcceptMsg* acceptMsg = new MergeAcceptMsg();
+        acceptMsg->setSender(getName());
+        send(acceptMsg, "out", rtable[proposerName]);
+    } else {
+        // Reject if they are not a beneficial partner.
+        EV << "[Cluster] REJECTING " << proposerName << " because the merge is not beneficial.\n";
+        MergeNackMsg* nackMsg = new MergeNackMsg();
+        nackMsg->setSender(getName());
+        send(nackMsg, "out", rtable[proposerName]);
+    }
 
     delete msg;
 }
@@ -104,64 +198,99 @@ void FullNode::handleMergeAck(MergeAckMsg* msg) {
     delete msg;
 }
 void FullNode::handleMergeNack(MergeNackMsg* msg) {
-    std::string sender = msg->getSender();
-    EV << "[Cluster] Received MergeNack from " << sender << "\n";
-    mergeResponses.erase(sender);
+    std::string rejectorName = msg->getSender();
+
+    if (sentMergeRequestTo == rejectorName) {
+        EV << "[Cluster] My merge proposal to " << rejectorName << " was REJECTED.\n";
+        sentMergeRequestTo = ""; // Reset state.
+    }
+
+    delete msg;
+}
+// In FullNode.cpp
+void FullNode::handleMergeAccept(MergeAcceptMsg* msg) {
+    std::string acceptorName = msg->getSender();
+
+    // NEW CHECK: If I have already merged this round, I must ignore this acceptance.
+    if (hasMergedThisRound) {
+        EV << "[Cluster] Received MergeAccept from " << acceptorName << ", but I have already merged. Ignoring.\n";
+        delete msg;
+        return;
+    }
+
+    if (sentMergeRequestTo == acceptorName) {
+        EV << "[Cluster] My merge proposal to " << acceptorName << " was ACCEPTED!\n";
+        EV << "[Cluster] I will now finalize the merge.\n";
+
+        // NEW: Lock myself from any further merge activity this round.
+        hasMergedThisRound = true;
+
+        std::string newCIP = std::max(std::string(getName()), acceptorName);
+        mergeClusters(getName(), acceptorName, newCIP);
+
+        sentMergeRequestTo = "";
+    } else {
+        EV << "[Cluster] Received an unexpected MergeAccept from " << acceptorName << ". Ignoring.\n";
+    }
+
     delete msg;
 }
 
-bool FullNode::receivedMutualMergeRequest(const std::string& targetCIP) {
-    return mergeResponses.find(targetCIP) != mergeResponses.end();
-}
+// In FullNode.cpp
+void FullNode::mergeClusters(const std::string& nodeA_name, const std::string& nodeB_name, const std::string& mergedID) {
+    EV << "[Cluster] Finalizing merge between " << nodeA_name << " and " << nodeB_name << " into new cluster: " << mergedID << "\n";
 
-void FullNode::mergeClusters(const std::string& a, const std::string& b, const std::string& mergedID) {
-    clusterID = mergedID;
-    CIP = mergedID;
+    // --- Step 1: Get the current cluster IDs for the two nodes ---
+    // It's possible one of the nodes is already part of a larger cluster from a previous round.
+    std::string clusterA_id = nodeToCluster[nodeA_name];
+    std::string clusterB_id = nodeToCluster[nodeB_name];
 
-    EV << "[Cluster] " << a << " and " << b << " merged to form " << mergedID << "\n";
-
-    // Merge both sets
-    std::set<std::string> allMembers = clusterMembers;
-    std::set<std::string> otherMembers = knownClusterMembers[b];
-    allMembers.insert(otherMembers.begin(), otherMembers.end());
-
-    // Broadcast updated cluster info
-    for (const std::string& member : allMembers) {
-        if (member == getName()) continue;  // self is updated
-
-        ClusterUpdateMsg* msg = new ClusterUpdateMsg();
-        msg->setNewClusterID(mergedID.c_str());
-        msg->setNewCIP(mergedID.c_str());
-        send(msg, "out", rtable[member]);
+    // If they are already in the same cluster, something is wrong. Abort.
+    if (clusterA_id == clusterB_id) {
+        EV << "[WARNING] Attempted to merge nodes that are already in the same cluster. Aborting merge.\n";
+        return;
     }
 
-    // Update local structures
-    clusterMembers = allMembers;
-    knownClusterMembers[mergedID] = allMembers;
+    // --- Step 2: Get the full member lists from the static map ---
+    std::set<std::string> membersOfA = clusterIDToMembers[clusterA_id];
+    std::set<std::string> membersOfB = clusterIDToMembers[clusterB_id];
 
-    // Update node-to-cluster mapping
-    for (const std::string& node : allMembers) {
-        nodeToCluster[node] = mergedID;
+    // --- Step 3: Create the new merged set of members ---
+    std::set<std::string> allNewMembers = membersOfA;
+    allNewMembers.insert(membersOfB.begin(), membersOfB.end());
+
+    // --- Step 4: Update the static maps (the single source of truth) ---
+    // Point every member of the new cluster to the new cluster ID.
+    for (const std::string& memberNode : allNewMembers) {
+        nodeToCluster[memberNode] = mergedID;
     }
 
-    // Update intra/inter cluster neighbors
-    intraClusterNeighbors.clear();
-    interClusterNeighbors.clear();
+    // Update the cluster-to-members map.
+    clusterIDToMembers[mergedID] = allNewMembers;
+    // Remove the old, now-empty clusters.
+    clusterIDToMembers.erase(clusterA_id);
+    clusterIDToMembers.erase(clusterB_id);
 
-    for (const auto& [neighborName, pcTuple] : nameToPCs[getName()]) {
-        if (neighborName == getName()) continue;
+    // --- Step 5: The node that initiated the merge becomes the new CIP and schedules the next round ---
+    // This node's local state needs to be updated.
+    this->clusterID = mergedID;
+    this->CIP = mergedID;
+    this->clusterMembers = allNewMembers;
 
-        if (allMembers.count(neighborName)) {
-            intraClusterNeighbors.insert(neighborName);
-        } else {
-            interClusterNeighbors.insert(neighborName);
+    EV << "[Cluster] Merge complete. New cluster '" << mergedID << "' has " << allNewMembers.size() << " members.\n";
+
+    // The node that performed the merge schedules the next round of clustering.
+    scheduleAt(simTime() + SimTime(0.1, SIMTIME_S), new cMessage("nextClusteringRound"));
+
+    // --- Step 6: Broadcast the update to all other members of the new cluster ---
+    // The acceptor node and other members need to be told about their new cluster ID and CIP.
+    for (const std::string& memberNode : allNewMembers) {
+        if (memberNode != getName()) { // Don't send to self
+            ClusterUpdateMsg* msg = new ClusterUpdateMsg();
+            msg->setNewClusterID(mergedID.c_str());
+            msg->setNewCIP(mergedID.c_str());
+            send(msg, "out", rtable[memberNode]);
         }
-    }
-    intraClusterNeighbors.insert(getName());
-
-    // Optional: rerun clustering if you're still CIP
-    if (CIP == getName()) {
-        runClusteringRound();
     }
 }
 
@@ -180,6 +309,8 @@ int FullNode::countClusterEdges(const std::set<std::string>& members) {
 }
 
 void FullNode::runClusteringRound() {
+    hasMergedThisRound = false; // Reset the flag at the start of each round
+    deltaSByNeighbor.clear(); // Add this line to clear old results
     std::string myName = getName();
 
     if (CIP != myName) {
@@ -196,53 +327,68 @@ void FullNode::runClusteringRound() {
         sendClusterInfoTo(neighbor);
     }
 
-    // Step 2: Wait and collect EC responses (synchronously for now)
-    std::map<std::string, double> deltaSByNeighbor;
+    // Now we wait for all ClusterInfoMsg to arrive
+    // and proceed in onAllClusterInfoReceived()
+}
 
-    for (const std::string& neighbor : interClusterNeighbors) {
-        ClusterInfo receivedEC = waitForClusterInfoFrom(neighbor);
+// In FullNode.cpp
 
-        // Construct local cluster info
-        ClusterInfo thisCluster(
-            getName(), clusterID, CIP,
-            clusterMembers.size(),
-            countClusterEdges(clusterMembers),
-            0, 0  // mergedNum* not used anymore
-        );
+// In FullNode.cpp
+void FullNode::onAllClusterInfoReceived() {
+    std::string myName = getName();
 
-        double deltaS = computeDeltaS(thisCluster, receivedEC);
-        EV << "[Cluster] ΔS with " << neighbor << " = " << deltaS << "\n";
+    // --- 1. Calculate deltaS for each neighbor who responded ---
+    // This loop correctly iterates over the received info, not the results map.
+    for (const auto& [neighborName, ciMsg] : receivedClusterInfos) {
+        // Get the members of the neighbor's cluster
+        std::string neighborClusterID = ciMsg.getClusterID();
+        std::set<std::string> neighborClusterMembers = clusterIDToMembers[neighborClusterID];
 
+        // Calculate the benefit of merging with this neighbor
+        double deltaS = computeDeltaS(clusterMembers, neighborClusterMembers);
+
+        EV << "[Cluster] ΔS with " << neighborName << " (" << neighborClusterID << ") = " << deltaS << "\n";
+
+        // Store the result if it's a positive benefit
         if (deltaS > 0) {
-            deltaSByNeighbor[neighbor] = deltaS;
+            deltaSByNeighbor[neighborName] = deltaS;
         }
     }
 
-    if (deltaSByNeighbor.empty()) {
-        EV << "[Cluster] No merges proposed for: " << myName << "\n";
+    // --- 2. Find the single best merge partner from the calculated results ---
+    std::string bestMergeTarget = "";
+    double maxDeltaS = 1e-9; // Use a small epsilon to avoid floating point issues
+
+    for (const auto& pair : deltaSByNeighbor) {
+        const std::string& currentNeighbor = pair.first;
+        double currentDeltaS = pair.second;
+
+        if (currentDeltaS > maxDeltaS) {
+            maxDeltaS = currentDeltaS;
+            bestMergeTarget = currentNeighbor;
+        } else if (std::abs(currentDeltaS - maxDeltaS) < 1e-9) {
+            if (currentNeighbor < bestMergeTarget) {
+                bestMergeTarget = currentNeighbor;
+            }
+        }
+    }
+
+    // --- 3. If a good partner is found, send a proposal ---
+    if (bestMergeTarget.empty()) {
+        EV << "[Cluster] No suitable merge partners found this round for " << myName << ".\n";
         return;
     }
 
-    // Step 3: Pick top neighbor with max ΔS
-    auto bestMerge = std::max_element(
-        deltaSByNeighbor.begin(), deltaSByNeighbor.end(),
-        [](const auto& a, const auto& b) { return a.second < b.second; }
-    );
+    EV << "[Cluster] Final Decision: Best merge target for " << myName << " is " << bestMergeTarget
+       << " with ΔS = " << maxDeltaS << "\n";
 
-    std::string targetCIP = bestMerge->first;
-    sendMergeRequest(targetCIP);
-
-    // Step 4: Wait for ACK
-    if (receivedMutualMergeRequest(targetCIP)) {
-        std::string newClusterID = std::min(myName, targetCIP);
-        mergeClusters(myName, targetCIP, newClusterID);
-    } else {
-        EV << "[Cluster] No mutual merge confirmation with " << targetCIP << "\n";
-    }
+    // Send the proposal and remember who we sent it to
+    sendMergeRequest(bestMergeTarget);
+    sentMergeRequestTo = bestMergeTarget;
 }
 
 
-void FullNode::initialize() {
+void FullNode::initialize() {   
     std::string myName = getName();
     clusterID = myName;   // Initially, every node is its own cluster
     CIP = myName;         // Each node starts as its own Cluster Information Proxy (CIP)
@@ -296,6 +442,7 @@ void FullNode::initialize() {
     // Step 4: Register self as initial cluster member (only self at start)
     clusterMembers.insert(myName);
     knownClusterMembers[clusterID] = clusterMembers;
+    clusterIDToMembers[clusterID].insert(getName());
     nodeToCluster[myName] = clusterID;
 
     // Step 5: Run clustering round
@@ -343,12 +490,17 @@ void FullNode::initialize() {
             baseMsg->setHopCount(0);
             baseMsg->encapsulate(trMsg);
 
-            scheduleAt(simTime() + time, baseMsg);
+            scheduleAt(simTime() + time + 10.0, baseMsg);
             _isFirstSelfMessage = true;
         }
     } else {
         EV << "No workload found for " << myName << ".\n";
     }
+    EV << "[DEBUG] nameToPCs[" << getName() << "] contains:\n";
+for (const auto& [neighbor, pc] : nameToPCs[getName()]) {
+    EV << "  " << getName() << " -- " << neighbor << "\n";
+}
+
 }
 
 
@@ -358,11 +510,30 @@ void FullNode::initialize() {
 
 void FullNode::handleMessage(cMessage *msg) {
     // Check for clustering-related messages first
-    if (ClusterInfoMsg* ci = dynamic_cast<ClusterInfoMsg*>(msg)) {
-        receivedClusterInfos[ci->getSender()] = *ci;
-        delete ci;
+    if (strcmp(msg->getName(), "nextClusteringRound") == 0) {
+        delete msg;
+        runClusteringRound();  // ← Your method that starts clustering again
         return;
     }
+    if (ClusterInfoMsg* ci = dynamic_cast<ClusterInfoMsg*>(msg)) {
+    std::string sender = ci->getSender();
+    std::string clusterID = ci->getClusterID();
+
+    receivedClusterInfos[sender] = *ci;
+
+    clusterIDToMembers[clusterID].insert(sender);
+    knownClusterMembers[clusterID].insert(sender);
+
+    EV << "[DEBUG] Learned that " << sender << " is in cluster " << clusterID << "\n";
+
+    if (receivedClusterInfos.size() == interClusterNeighbors.size()) {
+        onAllClusterInfoReceived();
+    }
+
+    delete ci;
+    return;
+    }
+
 
     if (ClusterUpdateMsg* cu = dynamic_cast<ClusterUpdateMsg*>(msg)) {
         clusterID = cu->getNewClusterID();
@@ -377,7 +548,10 @@ void FullNode::handleMessage(cMessage *msg) {
         handleMergeRequest(mr);
         return;
     }
-
+    if (MergeAcceptMsg* ma = dynamic_cast<MergeAcceptMsg*>(msg)) {
+        handleMergeAccept(ma);
+        return;
+    }
     if (MergeAckMsg* ma = dynamic_cast<MergeAckMsg*>(msg)) {
         handleMergeAck(ma);
         return;
@@ -654,6 +828,40 @@ void FullNode::finish() {
         EV << "COMPLETED/FAILED/CANCELED: " + std::to_string(countCompleted) + "/" + std::to_string(countFailed) + "/" + std::to_string(countCanceled) + "\n";
         EV << "Goodput: " +  std::to_string(goodput) + "\n";
     }
+    // In void FullNode::finish()
+
+// Only have one node print the final cluster state to avoid duplicate output
+if (strcmp(getName(), "node0") == 0) {
+        EV << "------------------ Final Cluster State (printed by " << getName() << ") ------------------\n";
+        // ADD THIS DEBUG LOOP
+    // END OF DEBUG LOOP
+        // Reverse the map to group nodes by cluster ID
+        std::map<std::string, std::vector<std::string>> finalClusters;
+        for (const auto& pair : nodeToCluster) {
+            std::string nodeName = pair.first;
+            std::string clusterId = pair.second;
+            finalClusters[clusterId].push_back(nodeName);
+        }
+
+        // Print each cluster and its members
+        EV << "\n--- Final Cluster Information ---\n";
+        EV << "[DEBUG] Final number of clusters: " << finalClusters.size() << "\n";
+for (const auto& pair : finalClusters) {
+    std::string clusterId = pair.first;
+    const auto& members = pair.second; // 'members' is the vector of strings
+
+    // Build a string of all members in the list
+    std::string memberList;
+    for (const std::string& member : members) {
+        memberList += member + " ";
+    }
+
+    // Now print the formatted output
+    EV << "Cluster ID: " << clusterId << " (" << members.size() << " members): " << memberList << "\n";
+}
+        EV << "--------------------------------------------------------------------------------\n";
+    }
+
 }
 
 
@@ -1947,5 +2155,3 @@ std::string FullNode::createHTLCId (std::string paymentHash, int htlcType) {
     return paymentHash + ":" + std::to_string(htlcType);
 }
 
-std::map<std::string, std::string> FullNode::nodeToCluster;
-ClusterGraph FullNode::clusterGraph;

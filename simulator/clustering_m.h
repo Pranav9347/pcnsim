@@ -21,6 +21,7 @@ class ClusterUpdateMsg;
 class MergeRequestMsg;
 class MergeAckMsg;
 class MergeNackMsg;
+class MergeAcceptMsg;
 /**
  * Class generated from <tt>clustering.msg:1</tt> by opp_msgtool.
  * <pre>
@@ -246,6 +247,42 @@ class MergeNackMsg : public ::omnetpp::cMessage
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const MergeNackMsg& obj) {obj.parsimPack(b);}
 inline void doParsimUnpacking(omnetpp::cCommBuffer *b, MergeNackMsg& obj) {obj.parsimUnpack(b);}
 
+/**
+ * Class generated from <tt>clustering.msg:30</tt> by opp_msgtool.
+ * <pre>
+ * message MergeAcceptMsg
+ * {
+ *     string sender;
+ * }
+ * </pre>
+ */
+class MergeAcceptMsg : public ::omnetpp::cMessage
+{
+  protected:
+    omnetpp::opp_string sender;
+
+  private:
+    void copy(const MergeAcceptMsg& other);
+
+  protected:
+    bool operator==(const MergeAcceptMsg&) = delete;
+
+  public:
+    MergeAcceptMsg(const char *name=nullptr, short kind=0);
+    MergeAcceptMsg(const MergeAcceptMsg& other);
+    virtual ~MergeAcceptMsg();
+    MergeAcceptMsg& operator=(const MergeAcceptMsg& other);
+    virtual MergeAcceptMsg *dup() const override {return new MergeAcceptMsg(*this);}
+    virtual void parsimPack(omnetpp::cCommBuffer *b) const override;
+    virtual void parsimUnpack(omnetpp::cCommBuffer *b) override;
+
+    virtual const char * getSender() const;
+    virtual void setSender(const char * sender);
+};
+
+inline void doParsimPacking(omnetpp::cCommBuffer *b, const MergeAcceptMsg& obj) {obj.parsimPack(b);}
+inline void doParsimUnpacking(omnetpp::cCommBuffer *b, MergeAcceptMsg& obj) {obj.parsimUnpack(b);}
+
 
 namespace omnetpp {
 
@@ -254,6 +291,7 @@ template<> inline ClusterUpdateMsg *fromAnyPtr(any_ptr ptr) { return check_and_c
 template<> inline MergeRequestMsg *fromAnyPtr(any_ptr ptr) { return check_and_cast<MergeRequestMsg*>(ptr.get<cObject>()); }
 template<> inline MergeAckMsg *fromAnyPtr(any_ptr ptr) { return check_and_cast<MergeAckMsg*>(ptr.get<cObject>()); }
 template<> inline MergeNackMsg *fromAnyPtr(any_ptr ptr) { return check_and_cast<MergeNackMsg*>(ptr.get<cObject>()); }
+template<> inline MergeAcceptMsg *fromAnyPtr(any_ptr ptr) { return check_and_cast<MergeAcceptMsg*>(ptr.get<cObject>()); }
 
 }  // namespace omnetpp
 
